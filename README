@@ -13,3 +13,7 @@ Because of this it supports the following features:
 - JMX MBean for easy monitoring
 	
 Most of the code was writtern by Filip Hanik, so the credit should go to him.
+
+If you use Maven, you can get artifacts for this project at my repository:
+
+	http://www.dataforte.net/listing/maven/releases
