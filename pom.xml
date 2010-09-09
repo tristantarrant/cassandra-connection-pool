@@ -7,7 +7,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.dataforte.cassandra</groupId>
-	<version>0.0.1</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<artifactId>cassandra-connection-pool</artifactId>
 	<packaging>jar</packaging>
 	<name>Cassandra Connection Pool</name>
