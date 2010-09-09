@@ -1,0 +1,67 @@
+<Storage>
+	<ClusterName>ConnectionPoolTest</ClusterName>
+
+	<AutoBootstrap>false</AutoBootstrap>
+
+	<Keyspaces>
+		<Keyspace Name="KeyspaceA">
+			<ColumnFamily CompareWith="BytesType" Name="FamilyA" KeysCached="10%" />
+			<ColumnFamily CompareWith="LongType" Name="FamilyB"	KeysCached="10%" />
+			<ReplicaPlacementStrategy>org.apache.cassandra.locator.RackUnawareStrategy</ReplicaPlacementStrategy>
+			<ReplicationFactor>1</ReplicationFactor>
+			<EndPointSnitch>org.apache.cassandra.locator.EndPointSnitch</EndPointSnitch>
+		</Keyspace>
+	</Keyspaces>
+	<Authenticator>org.apache.cassandra.auth.AllowAllAuthenticator</Authenticator>
+
+	<Partitioner>org.apache.cassandra.dht.OrderPreservingPartitioner</Partitioner>
+
+	<InitialToken></InitialToken>
+
+	<CommitLogDirectory>${java.io.tmpdir}/cassandra-connection-pool/commitlog</CommitLogDirectory>
+	<DataFileDirectories>
+		<DataFileDirectory>${java.io.tmpdir}/cassandra-connection-pool/data</DataFileDirectory>
+	</DataFileDirectories>
+	<CalloutLocation>${java.io.tmpdir}/cassandra-connection-pool/callouts</CalloutLocation>
+	<StagingFileDirectory>${java.io.tmpdir}/cassandra-connection-pool/staging</StagingFileDirectory>
+
+	<Seeds>
+		<Seed>127.0.0.1</Seed>
+	</Seeds>
+
+
+
+	<RpcTimeoutInMillis>10000</RpcTimeoutInMillis>
+	<CommitLogRotationThresholdInMB>128</CommitLogRotationThresholdInMB>
+
+	<ListenAddress></ListenAddress>
+	<StoragePort>7000</StoragePort>
+
+	<ThriftAddress>localhost</ThriftAddress>
+	<ThriftPort>9160</ThriftPort>
+	<ThriftFramedTransport>false</ThriftFramedTransport>
+
+	<DiskAccessMode>auto</DiskAccessMode>
+	<RowWarningThresholdInMB>512</RowWarningThresholdInMB>
+
+	<SlicedBufferSizeInKB>64</SlicedBufferSizeInKB>
+
+	<FlushDataBufferSizeInMB>32</FlushDataBufferSizeInMB>
+	<FlushIndexBufferSizeInMB>8</FlushIndexBufferSizeInMB>
+
+	<ColumnIndexSizeInKB>64</ColumnIndexSizeInKB>
+
+	<MemtableThroughputInMB>64</MemtableThroughputInMB>
+	<BinaryMemtableThroughputInMB>256</BinaryMemtableThroughputInMB>
+	<MemtableOperationsInMillions>0.3</MemtableOperationsInMillions>
+	<MemtableFlushAfterMinutes>60</MemtableFlushAfterMinutes>
+
+	<ConcurrentReads>8</ConcurrentReads>
+	<ConcurrentWrites>32</ConcurrentWrites>
+
+
+	<CommitLogSync>periodic</CommitLogSync>
+
+	<CommitLogSyncPeriodInMS>10000</CommitLogSyncPeriodInMS>
+	<GCGraceSeconds>864000</GCGraceSeconds>
+</Storage>

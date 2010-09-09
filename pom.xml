@@ -1,8 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<groupId>net.dataforte</groupId>
 		<artifactId>dataforte-parent</artifactId>
-		<version>2</version>
+		<version>3</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -22,7 +23,7 @@
 			<organizationUrl>http://www.dataforte.net</organizationUrl>
 		</contributor>
 	</contributors>
-	
+
 	<distributionManagement>
 		<site>
 			<id>ftp.dataforte.net</id>
@@ -45,7 +46,7 @@
 		<dependency>
 			<groupId>org.apache</groupId>
 			<artifactId>cassandra</artifactId>
-			<version>0.6.5</version>			
+			<version>0.6.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -59,11 +60,50 @@
 			<version>1.2.16</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.google.collections</groupId>
+			<artifactId>google-collections</artifactId>
+			<version>1.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.cliffc.high_scale_lib</groupId>
+			<artifactId>high-scale-lib</artifactId>
+			<version>1.0.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.reardencommerce</groupId>
+			<artifactId>clhm-production</artifactId>
+			<version>1.0.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.5</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<scm>
-		<connection>git@github.com:tristantarrant/cassandra-connection-pool.git</connection>
-		<developerConnection>git@github.com:tristantarrant/cassandra-connection-pool.git</developerConnection>
+		<connection>scm:git:http://github.com/tristantarrant/cassandra-connection-pool.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/tristantarrant/cassandra-connection-pool.git</developerConnection>
 		<url>http://github.com/tristantarrant/cassandra-connection-pool</url>
 	</scm>
+
+	<build>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
+	</build>
 </project>
