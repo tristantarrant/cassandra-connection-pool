@@ -1,1 +1,15 @@
 Cassandra Connection Pool
+=========================
+
+This is an implementation of a Connection Pool for Cassandra based on Tomcat 7's excellent jdbc-pool
+
+	http://people.apache.org/~fhanik/jdbc-pool/jdbc-pool.html
+	
+Because of this it supports the following features:
+
+- settings for initialSize, maxIdle, minIdle and maxActive connections
+- connection validation on borrow and return
+- abandoned connection detection
+- JMX MBean for easy monitoring
+	
+Most of the code was writtern by Filip Hanik, so the credit should go to him.
