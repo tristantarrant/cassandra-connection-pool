@@ -31,10 +31,13 @@ public class PoolProperties implements PoolConfiguration {
     protected static AtomicInteger poolCounter = new AtomicInteger(0);
     
     protected String host;
+    protected String[] configuredHosts;
     protected int port = 9160;
     protected boolean framed = false;
-    
-    protected int initialSize = 10;
+    protected boolean automaticHostDiscovery = true;
+    protected int socketTimeout = 5000;
+
+	protected int initialSize = 10;
     protected int maxActive = 100;
     protected int maxIdle = maxActive;
     protected int minIdle = initialSize;
@@ -50,7 +53,7 @@ public class PoolProperties implements PoolConfiguration {
     protected boolean removeAbandoned = false;
     protected int removeAbandonedTimeout = 60;
     protected boolean logAbandoned = false;
-    protected String name = "Cassandra Connection Pool["+(poolCounter.addAndGet(1))+"-"+System.identityHashCode(PoolProperties.class)+"]";
+    protected String name = "Cassandra Connection Pool["+(poolCounter.incrementAndGet())+"-"+System.identityHashCode(PoolProperties.class)+"]";
     protected String password;
     protected String username;
     protected long validationInterval = 30000;
@@ -105,6 +108,15 @@ public class PoolProperties implements PoolConfiguration {
     public boolean isAccessToUnderlyingConnectionAllowed() {
         return accessToUnderlyingConnectionAllowed;
     }
+    
+    @Override
+    public boolean isAutomaticHostDiscovery() {
+		return automaticHostDiscovery;
+	}
+
+	public void setAutomaticHostDiscovery(boolean automaticHostDiscovery) {
+		this.automaticHostDiscovery = automaticHostDiscovery;
+	}
 
     /** 
      * {@inheritDoc}
@@ -645,12 +657,23 @@ public class PoolProperties implements PoolConfiguration {
 	@Override
 	public void setHost(String host) {
 		this.host = host;
+		String[] hs = this.host.split(";");
+		configuredHosts = new String[hs.length];
 		
+		for(int i=0; i<hs.length; i++) {
+			configuredHosts[i] = hs[i].trim();
+		}
 	}
 
 	@Override
 	public String getHost() {
-		return host;
+		StringBuilder sb = new StringBuilder();
+		for(int i=0; i<configuredHosts.length; i++) {
+			if(i>0)
+				sb.append(",");
+			sb.append(configuredHosts);		
+		}
+		return sb.toString();
 	}
 
 	@Override
@@ -670,7 +693,22 @@ public class PoolProperties implements PoolConfiguration {
 	}
 
 	@Override
-	public boolean getFramed() {
+	public boolean isFramed() {
 		return framed;
+	}
+
+	@Override
+	public int getSocketTimeout() {
+		return socketTimeout;
+	}
+
+	@Override
+	public void setSocketTimeout(int socketTimeout) {
+		this.socketTimeout = socketTimeout;
+	}
+
+	@Override
+	public String[] getConfiguredHosts() {
+		return configuredHosts;
 	}
 }

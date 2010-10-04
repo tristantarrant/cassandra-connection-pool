@@ -97,6 +97,11 @@ public class ConnectionPool {
 	 * counter to track how many threads are waiting for a connection
 	 */
 	private AtomicInteger waitcount = new AtomicInteger(0);
+	
+	/**
+	 * the object which contains the list of active Cassandra nodes
+	 */
+	private CassandraRing cassandraRing = null;
 
 	// ===============================================================================
 	// PUBLIC METHODS
@@ -270,7 +275,8 @@ public class ConnectionPool {
 		
 		connectionMap = new HashMap<Cassandra.Iface, PooledConnection>();
 		
-
+		cassandraRing = new CassandraRing(poolProperties.getConfiguredHosts());
+		
 		busy = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(), false);
 
 		if (properties.isFairQueue()) {
@@ -921,6 +927,10 @@ public class ConnectionPool {
 	 */
 	public net.dataforte.cassandra.pool.jmx.ConnectionPool getJmxPool() {
 		return jmxPool;
+	}
+
+	public CassandraRing getCassandraRing() {
+		return cassandraRing;
 	}
 
 	/**

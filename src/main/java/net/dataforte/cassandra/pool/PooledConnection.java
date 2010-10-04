@@ -16,11 +16,11 @@
  */
 package net.dataforte.cassandra.pool;
 
+import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.cassandra.thrift.Cassandra;
 import org.apache.thrift.TException;
@@ -140,9 +140,10 @@ public class PooledConnection {
             } //catch
         } //end if
         
-        TSocket socket = new TSocket(poolProperties.getHost(), poolProperties.getPort());
+        TSocket socket = new TSocket(parent.getCassandraRing().getHost(), poolProperties.getPort());
+        socket.setTimeout(poolProperties.getSocketTimeout());
 
-		if (poolProperties.getFramed())
+		if (poolProperties.isFramed())
 			this.transport = new TFramedTransport(socket);
 		else
 			this.transport = socket;
@@ -151,10 +152,9 @@ public class PooledConnection {
 		TProtocol protocol = new TBinaryProtocol(this.transport);
 
 		this.connection = new Cassandra.Client(protocol);
-        
-                
+                        
         this.discarded = false;
-        this.lastConnected = System.currentTimeMillis();
+        this.lastConnected = System.currentTimeMillis();        
     }
     
     
@@ -282,7 +282,7 @@ public class PooledConnection {
         }
 
         try {
-            connection.describe_cluster_name();
+        	parent.getCassandraRing().refresh(connection); // Bonus: we validate the connection and also get an update list of hosts from Cassandra
             this.lastValidated = now;
             return true;
         } catch (Exception ignore) {
@@ -484,5 +484,4 @@ public class PooledConnection {
     public HashMap<Object,Object> getAttributes() {
         return attributes;
     }
-
 }

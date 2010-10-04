@@ -26,7 +26,7 @@ package net.dataforte.cassandra.pool;
 public interface PoolConfiguration {
 
 	/**
-	 * Sets the Cassandra host
+	 * Sets the Cassandra host. May be a comma-separated list of addresses
 	 * 
 	 * @param host
 	 */
@@ -62,7 +62,19 @@ public interface PoolConfiguration {
      * Returns whether framed connection mode is being used
      * @return
      */
-    public boolean getFramed();
+    public boolean isFramed();
+    
+    /**
+     * Sets whether Cassandra hosts should be queried to automatically obtain a list of other hosts
+     * @param autoDiscovery
+     */
+    public void setAutomaticHostDiscovery(boolean autoDiscovery);
+    
+    /**
+     * Returns whether automatic host discovery is on
+     * @return
+     */
+    public boolean isAutomaticHostDiscovery();
 
     /**
      * Connections that have been abandoned (timed out) wont get closed and reported up unless the number of connections in use are 
@@ -542,6 +554,26 @@ public interface PoolConfiguration {
      * Any value lesser than or equal to 0 means the check is disabled. 
      * @return Returns the time in seconds to pass before a connection is marked an abanoned suspect.
      */
-    public int getSuspectTimeout();    
+    public int getSuspectTimeout();
+
+    /**
+     * Returns the socket timeout in milliseconds
+     * @return
+     */
+	int getSocketTimeout();
+
+	/**
+	 * Sets the socket timeout in milliseconds
+	 * 
+	 * @param socketTimeout
+	 */
+	void setSocketTimeout(int socketTimeout);
+
+	/**
+	 * Returns the list of configured hosts (may be different from the actual list if dynamic discovery is enabled
+	 * 
+	 * @return
+	 */
+	String[] getConfiguredHosts();    
 
 }

@@ -10,7 +10,6 @@ import org.apache.thrift.transport.TTransportException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.asm.util.CheckAnnotationAdapter;
 
 public class ConnectionPoolTest {
 
@@ -107,9 +106,24 @@ public class ConnectionPoolTest {
 		} catch (TTransportException e) {
 			// Expected exception
 		}
-		pool.close();
-		
+		pool.close();		
 	}
 
-	
+	@Test
+	public void testRing() throws Exception {
+		PoolConfiguration prop = new PoolProperties();
+		prop.setHost("localhost");
+		prop.setAutomaticHostDiscovery(true);
+		ConnectionPool pool = new ConnectionPool(prop);
+		// Get a connection
+		Iface connection = pool.getConnection();
+		Assert.assertNotNull(connection);
+		CassandraRing cassandraRing = pool.getCassandraRing();
+		
+		cassandraRing.refresh(connection);
+		
+		String[] hosts = cassandraRing.getHosts();
+		Assert.assertNotNull(hosts);
+		Assert.assertEquals(1, hosts.length);		
+	}
 }
