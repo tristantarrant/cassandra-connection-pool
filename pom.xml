@@ -27,7 +27,7 @@
 		<site>
 			<id>ftp.dataforte.net</id>
 			<name>Dataforte site</name>
-			<url>ftp://ftp.dataforte.net/www.dataforte.net/software/${project.artifactId}/</url>
+			<url>ftp://ftp.dataforte.net/www.dataforte.net/software/</url>
 		</site>
 	</distributionManagement>
 
