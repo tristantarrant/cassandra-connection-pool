@@ -79,9 +79,9 @@ public class ConnectionPool {
 	private Map<Cassandra.Iface, PooledConnection> connectionMap;
 
 	/**
-	 * The thread that is responsible for checking abandoned and idle threads
+	 * The thread that is responsible for checking abandoned and idle threads and for keeping an up-to-date list of Cassandra hosts
 	 */
-	private volatile PoolCleaner poolCleaner;
+	private volatile PoolMaintenance poolMaintenance;
 
 	/**
 	 * Pool closed flag
@@ -228,8 +228,8 @@ public class ConnectionPool {
 		// prevent other threads from entering
 		this.closed = true;
 		// stop background thread
-		if (poolCleaner != null) {
-			poolCleaner.stopRunning();
+		if (poolMaintenance != null) {
+			poolMaintenance.stopRunning();
 		}
 
 		/* release all idle connections */
@@ -287,8 +287,8 @@ public class ConnectionPool {
 
 		// if the evictor thread is supposed to run, start it now
 		if (properties.isPoolSweeperEnabled()) {
-			poolCleaner = new PoolCleaner("[Pool-Cleaner]:" + properties.getName(), this, properties.getTimeBetweenEvictionRunsMillis());
-			poolCleaner.start();
+			poolMaintenance = new PoolMaintenance("[Pool-Maintenance]:" + properties.getName(), this, properties.getTimeBetweenEvictionRunsMillis());
+			poolMaintenance.start();
 		} // end if
 
 		// make sure the pool is properly configured
@@ -855,6 +855,34 @@ public class ConnectionPool {
 		}
 
 	}
+	
+	/**
+	 * Refreshes the ring information
+	 */
+	public void refreshRing() {
+		try {
+			if (idle.size() == 0)
+				return;
+			Iterator<PooledConnection> unlocked = idle.iterator();
+			while (unlocked.hasNext()) {
+				PooledConnection con = unlocked.next();
+				try {
+					con.lock();
+					// the con been taken out, we can't use it
+					if (busy.contains(con))
+						continue;
+					cassandraRing.refresh(con.getConnection());
+				} finally {
+					con.unlock();
+				}
+			} // while
+		} catch (ConcurrentModificationException e) {
+			log.debug("refreshRing failed.", e);
+		} catch (Exception e) {
+			log.warn("refreshRing failed, it will be retried.", e);
+		}
+
+	}
 
 	/**
 	 * Creates a stack trace representing the existing thread's current state.
@@ -942,23 +970,23 @@ public class ConnectionPool {
 		} catch (Exception x) {
 			log.warn("Unable to start JMX integration for connection pool. Instance[" + getName() + "] can't be monitored.", x);
 		}
-	}
+	}	
 
-	protected class PoolCleaner extends Thread {
+	protected class PoolMaintenance extends Thread {
 		protected ConnectionPool pool;
 		protected long sleepTime;
 		protected volatile boolean run = true;
 
-		PoolCleaner(String name, ConnectionPool pool, long sleepTime) {
+		PoolMaintenance(String name, ConnectionPool pool, long sleepTime) {
 			super(name);
 			this.setDaemon(true);
 			this.pool = pool;
 			this.sleepTime = sleepTime;
 			if (sleepTime <= 0) {
-				log.warn("Database connection pool evicter thread interval is set to 0, defaulting to 30 seconds");
+				log.warn("Database connection pool maintenance thread interval is set to 0, defaulting to 30 seconds");
 				this.sleepTime = 1000 * 30;
 			} else if (sleepTime < 1000) {
-				log.warn("Database connection pool evicter thread interval is set to lower than 1 second.");
+				log.warn("Database connection pool maintenance thread interval is set to lower than 1 second.");
 			}
 		}
 

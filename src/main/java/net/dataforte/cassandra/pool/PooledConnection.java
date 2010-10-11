@@ -18,6 +18,8 @@ package net.dataforte.cassandra.pool;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -29,6 +31,7 @@ import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
+import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -140,15 +143,29 @@ public class PooledConnection {
             } //catch
         } //end if
         
-        TSocket socket = new TSocket(parent.getCassandraRing().getHost(), poolProperties.getPort());
-        socket.setTimeout(poolProperties.getSocketTimeout());
-
-		if (poolProperties.isFramed())
-			this.transport = new TFramedTransport(socket);
-		else
-			this.transport = socket;
-
-		this.transport.open();
+        List<CassandraHost> hosts = parent.getCassandraRing().getHosts();
+        Iterator<CassandraHost> hostIterator = hosts.iterator();
+        for(this.transport=null; this.transport==null; ) {
+        	if(!hostIterator.hasNext()) {
+        		throw new TException("Could not connect to any hosts");
+        	}
+        	CassandraHost host = hostIterator.next();
+        	if(!host.isGood())
+        		continue;
+	        try {
+		        TSocket socket = new TSocket(host.getHost(), poolProperties.getPort(), poolProperties.getSocketTimeout());	    
+				if (poolProperties.isFramed())
+					this.transport = new TFramedTransport(socket);
+				else
+					this.transport = socket;
+				host.timestamp();
+				this.transport.open();
+				host.setGood(true);
+	        } catch (TTransportException tte) {
+	        	host.setGood(false);
+	        	this.transport = null;
+	        }
+        }
 		TProtocol protocol = new TBinaryProtocol(this.transport);
 
 		this.connection = new Cassandra.Client(protocol);

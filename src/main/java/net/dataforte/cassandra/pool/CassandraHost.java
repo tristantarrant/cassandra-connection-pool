@@ -1,40 +1,37 @@
 package net.dataforte.cassandra.pool;
 
 public class CassandraHost {
-	public enum Status {
-		ONLINE, OFFLINE
-	};
+	String host;
+	long lastUsed;
+	boolean good;
 
-	String address;
-	long lastSuccess;
-	long lastFailure;
-
-	public CassandraHost(String address) {
-		setAddress(address);
+	public CassandraHost(String host) {
+		this.host = host;
+		good = true;
 	}
 
-	public String getAddress() {
-		return address;
+	public String getHost() {
+		return host;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
+	public void timestamp() {
+		lastUsed = System.currentTimeMillis();
 	}
 
-	public long getLastSuccess() {
-		return lastSuccess;
+	public long getLastUsed() {
+		return lastUsed;
 	}
 
-	public void setLastSuccess(long lastSuccess) {
-		this.lastSuccess = lastSuccess;
+	public boolean isGood() {
+		return good;
 	}
 
-	public long getLastFailure() {
-		return lastFailure;
+	public void setGood(boolean good) {
+		this.good = good;
 	}
 
-	public void setLastFailure(long lastFailure) {
-		this.lastFailure = lastFailure;
+	public String toString() {
+		return "[" + host + ",status=" + good + ",timestamp=" + lastUsed + "]";
 	}
 
 }
