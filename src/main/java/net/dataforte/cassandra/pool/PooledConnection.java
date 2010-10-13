@@ -150,21 +150,22 @@ public class PooledConnection {
         		throw new TException("Could not connect to any hosts");
         	}
         	CassandraHost host = hostIterator.next();
-        	if(!host.isGood())
-        		continue;
-	        try {
-		        TSocket socket = new TSocket(host.getHost(), poolProperties.getPort(), poolProperties.getSocketTimeout());	    
-				if (poolProperties.isFramed())
-					this.transport = new TFramedTransport(socket);
-				else
-					this.transport = socket;
-				host.timestamp();
-				this.transport.open();
-				host.setGood(true);
-	        } catch (TTransportException tte) {
-	        	host.setGood(false);
-	        	this.transport = null;
-	        }
+        	// If the host is good or the validation interval has passed since last checking with it, attempt to get a connection
+        	if(host.isGood() || (host.getLastUsed()+poolProperties.getHostRetryInterval() < System.currentTimeMillis())) {        		
+		        try {
+			        TSocket socket = new TSocket(host.getHost(), poolProperties.getPort(), poolProperties.getSocketTimeout());	    
+					if (poolProperties.isFramed())
+						this.transport = new TFramedTransport(socket);
+					else
+						this.transport = socket;
+					host.timestamp();
+					this.transport.open();
+					host.setGood(true);
+		        } catch (TTransportException tte) {
+		        	host.setGood(false);
+		        	this.transport = null;
+		        }
+        	}
         }
 		TProtocol protocol = new TBinaryProtocol(this.transport);
 

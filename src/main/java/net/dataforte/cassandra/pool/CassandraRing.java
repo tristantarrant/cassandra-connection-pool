@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.cassandra.thrift.Cassandra;
 import org.apache.cassandra.thrift.TokenRange;

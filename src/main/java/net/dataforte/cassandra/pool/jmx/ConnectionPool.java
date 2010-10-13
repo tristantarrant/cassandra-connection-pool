@@ -492,4 +492,15 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
 		return null;
 	}
 
+	@Override
+	public long getHostRetryInterval() {
+		return getPoolProperties().getHostRetryInterval();
+	}
+
+	@Override
+	public void setHostRetryInterval(long hostRetryInterval) {
+		getPoolProperties().setHostRetryInterval(hostRetryInterval);		
+	}
+
+	
 }

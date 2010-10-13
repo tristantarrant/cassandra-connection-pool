@@ -574,6 +574,19 @@ public interface PoolConfiguration {
 	 * 
 	 * @return
 	 */
-	String[] getConfiguredHosts();    
+	String[] getConfiguredHosts();
+
+	/**
+	 * Returns the interval in milliseconds before retrying a host to which a connection has failed in the past.
+	 * Default is 300000 (5 minutes)
+	 * @return
+	 */
+	public long getHostRetryInterval();
+	
+	/**
+	 * Sets the interval in milliseconds before retrying a host to which a connection has failed in the past.
+	 * @param hostRetryInterval number of millieseconds before retrying a host
+	 */
+	void setHostRetryInterval(long hostRetryInterval);
 
 }
