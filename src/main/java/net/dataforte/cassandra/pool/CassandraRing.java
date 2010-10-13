@@ -61,15 +61,15 @@ public class CassandraRing {
 	}
 
 	public List<CassandraHost> getHosts() {
-		// Returns a list of hosts ordered according to the policy
-		ArrayList<CassandraHost> list = new ArrayList<CassandraHost>(activeHosts);
+		// Returns a list of hosts ordered according to the policy		
 		switch(this.policy) {
 		case RANDOM:			
+			List<CassandraHost> list = new ArrayList<CassandraHost>(activeHosts);
 			Collections.shuffle(list, random);
 			return list;
 		case ROUND_ROBIN:
 		default:
-			return list;
+			return new OffsetArrayList<CassandraHost>(activeHosts, random.nextInt(activeHosts.size()));			
 		}
 	}
 
