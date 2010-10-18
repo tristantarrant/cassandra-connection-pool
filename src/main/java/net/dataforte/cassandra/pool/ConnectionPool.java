@@ -511,7 +511,7 @@ public class ConnectionPool {
 	}
 
 	/**
-	 * Creates a JDBC connection and tries to connect to the database.
+	 * Creates a Cassandra connection and tries to connect to the database.
 	 * 
 	 * @param now
 	 *            timestamp of when this was called
@@ -547,7 +547,7 @@ public class ConnectionPool {
 		} catch (Exception e) {
 			error = true;
 			if (log.isDebugEnabled())
-				log.debug("Unable to create a new JDBC connection.", e);
+				log.debug("Unable to create a new Cassandra connection.", e);
 			if (e instanceof TException) {
 				throw (TException) e;
 			} else {
