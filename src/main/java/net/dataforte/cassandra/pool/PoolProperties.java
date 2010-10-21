@@ -16,8 +16,18 @@
  */
 package net.dataforte.cassandra.pool;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,6 +42,7 @@ public class PoolProperties implements PoolConfiguration {
 	protected int port = 9160;
 	protected boolean framed = false;
 	protected boolean automaticHostDiscovery = true;
+	protected HostFailoverPolicy failoverPolicy = HostFailoverPolicy.ON_FAIL_TRY_ALL_AVAILABLE;
 	protected int socketTimeout = 5000;
 
 	protected int initialSize = 10;
@@ -64,6 +75,90 @@ public class PoolProperties implements PoolConfiguration {
 	protected long maxAge = 0;
 	protected boolean useLock = false;
 	protected int suspectTimeout = 0;
+
+	private String dataSourceJNDI;
+	private Object dataSource;
+	
+	static private Map<String, PropertyDescriptor> propertyDescriptors;
+	
+	static {
+		propertyDescriptors = new HashMap<String, PropertyDescriptor>();
+		try {
+			BeanInfo beanInfo = Introspector.getBeanInfo(PoolProperties.class);
+			for (PropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
+				propertyDescriptors.put(pd.getName(), pd);
+			}
+			propertyDescriptors = Collections.unmodifiableMap(propertyDescriptors);
+		} catch (IntrospectionException e) {
+			throw new RuntimeException("Could not introspect PoolProperties", e);
+		}
+	}
+	
+	public static Collection<String> getPropertyNames() {
+		return propertyDescriptors.keySet();
+	}
+	
+	public PoolProperties() {
+	}
+	
+	public void set(String name, Object value) {
+		PropertyDescriptor pd = propertyDescriptors.get(name);
+  
+        if (pd == null) {
+           throw new RuntimeException("Unknown property: " + name);
+        }
+  
+        Method setter = pd.getWriteMethod();
+  
+        if (setter == null) {
+           throw new RuntimeException("No write method for: " + name);
+        }
+  
+        try {
+        	Class<?> type = setter.getParameterTypes()[0];
+        	// if the incoming value is a string and the setter is for something different from a string, attempt some conversions
+        	if(value!=null && value instanceof String && type!=String.class) {
+        		String svalue = (String)value;
+	        	if(int.class==type) {
+	        		setter.invoke(this, new Object[] { Integer.parseInt(svalue) } );
+	        		return;
+	        	} else if(long.class==type) {
+	        		setter.invoke(this, new Object[] { Long.parseLong(svalue) } );
+	        		return;
+	        	} else if(boolean.class==type) {
+	        		setter.invoke(this, new Object[] { Boolean.parseBoolean(svalue) } );
+	        		return;
+	        	} else if(type.isEnum()) {
+	        		Class unsafeType = type;
+	        		setter.invoke(this, new Object[] { Enum.valueOf(unsafeType, svalue) } );
+	        		return;	        		
+	        	}
+        	}
+			setter.invoke(this, new Object[] { value } );
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+     }
+
+	public Object get(String name) {
+		PropertyDescriptor pd = propertyDescriptors.get(name);
+
+		if (pd == null) {
+			throw new RuntimeException("Unknown property: " + name);
+		}
+
+		Method getter = pd.getReadMethod();
+
+		if (getter == null) {
+			throw new RuntimeException("No read method for: " + name);
+		}
+
+		try {
+			return getter.invoke(this, new Object[] {});
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -665,12 +760,17 @@ public class PoolProperties implements PoolConfiguration {
 		this.useLock = useLock;
 	}
 
-	public static Properties getProperties(String propText, Properties props) {
+	public static Map<String,String> getProperties(String propText, Map<String,String> props) {
 		if (props == null)
-			props = new Properties();
+			props = new HashMap<String, String>();
 		if (propText != null) {
 			try {
-				props.load(new ByteArrayInputStream(propText.replace(';', '\n').getBytes()));
+				Properties p = new Properties();
+				p.load(new ByteArrayInputStream(propText.replace(';', '\n').getBytes()));				
+				props.clear();
+				for(Entry<String, String> s : props.entrySet()) {
+					props.put(s.getKey(), s.getValue());
+				}
 			} catch (IOException x) {
 				throw new RuntimeException(x);
 			}
@@ -739,6 +839,36 @@ public class PoolProperties implements PoolConfiguration {
 	@Override
 	public void setHostRetryInterval(long hostRetryInterval) {
 		this.hostRetryInterval = hostRetryInterval;
+	}
+
+	@Override
+	public void setFailoverPolicy(HostFailoverPolicy failoverPolicy) {
+		this.failoverPolicy = failoverPolicy;
+	}
+
+	@Override
+	public HostFailoverPolicy getFailoverPolicy() {
+		return failoverPolicy;
+	}
+
+	@Override
+	public void setDataSourceJNDI(String jndiDS) {
+		this.dataSourceJNDI = jndiDS;
+	}
+
+	@Override
+	public String getDataSourceJNDI() {
+		return this.dataSourceJNDI;
+	}
+
+	@Override
+	public void setDataSource(Object ds) {
+		this.dataSource = ds;
+	}
+
+	@Override
+	public Object getDataSource() {
+		return this.dataSource;
 	}
 
 }

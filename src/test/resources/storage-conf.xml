@@ -18,6 +18,7 @@
 
 	<InitialToken></InitialToken>
 
+	<SavedCachesDirectory>${java.io.tmpdir}/cassandra-connection-pool/saved_caches</SavedCachesDirectory>
 	<CommitLogDirectory>${java.io.tmpdir}/cassandra-connection-pool/commitlog</CommitLogDirectory>
 	<DataFileDirectories>
 		<DataFileDirectory>${java.io.tmpdir}/cassandra-connection-pool/data</DataFileDirectory>

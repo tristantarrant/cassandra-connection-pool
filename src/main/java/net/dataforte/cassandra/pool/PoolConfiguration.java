@@ -24,6 +24,22 @@ package net.dataforte.cassandra.pool;
  */
 
 public interface PoolConfiguration {
+	
+	/**
+	 * Provides a generic setter for any of the declared properties of the PoolConfiguration
+	 * 
+	 * @param name the name of the property
+	 * @param value the new value of the property
+	 */
+	public void set(String name, Object value);
+	
+	/**
+	 * Provides a generic getter for any of the declared properties of the PoolConfiguration
+	 * 
+	 * @param name the name of the property
+	 * @return the value of the property
+	 */
+	public Object get(String name);
 
 	/**
 	 * Sets the Cassandra host. May be a comma-separated list of addresses
@@ -75,6 +91,18 @@ public interface PoolConfiguration {
      * @return
      */
     public boolean isAutomaticHostDiscovery();
+    
+    /**
+     * Sets the host failover policy, i.e. what to do when connecting to a host fails
+     */
+    public void setFailoverPolicy(HostFailoverPolicy failoverPolicy);
+    
+    /**
+     * Returns the failover policy.
+     * 
+     * @return
+     */
+    public HostFailoverPolicy getFailoverPolicy();
 
     /**
      * Connections that have been abandoned (timed out) wont get closed and reported up unless the number of connections in use are 
@@ -588,5 +616,32 @@ public interface PoolConfiguration {
 	 * @param hostRetryInterval number of millieseconds before retrying a host
 	 */
 	void setHostRetryInterval(long hostRetryInterval);
+	
+	/**
+     * Configure the connection pool to use a DataSource according to {@link PoolConfiguration#setDataSource(Object)}
+     * But instead of injecting the object, specify the JNDI location.
+     * After a successful JNDI look, the {@link PoolConfiguration#getDataSource()} will not return null. 
+     * @param jndiDS -the JNDI string @TODO specify the rules here.
+     */
+    public void setDataSourceJNDI(String jndiDS);
+    
+    /**
+     * Returns the JNDI string configured for data source usage.
+     * @return the JNDI string or null if not set
+     */
+    public String getDataSourceJNDI();
 
+    /**
+     * Injects a datasource that will be used to retrieve/create connections.
+     * 
+     * @param ds the {@link javax.sql.DataSource} to be used for creating connections to be pooled.
+     */
+    public void setDataSource(Object ds);
+    
+    /**
+     * Returns a datasource, if one exists that is being used to create connections.
+     * 
+     * @return the datasource object
+     */
+    public Object getDataSource();
 }

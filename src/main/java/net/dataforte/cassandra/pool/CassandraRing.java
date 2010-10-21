@@ -11,19 +11,15 @@ import org.apache.cassandra.thrift.Cassandra;
 import org.apache.cassandra.thrift.TokenRange;
 
 public class CassandraRing {
-	public enum Policy {
-		ROUND_ROBIN, RANDOM
-	};
-
-	private Policy policy;
+	private HostCyclePolicy policy;
 	private Random random = new Random();
 	private List<CassandraHost> activeHosts;
 
 	public CassandraRing(String hosts[]) {
-		this(hosts, Policy.RANDOM);
+		this(hosts, HostCyclePolicy.RANDOM);
 	}
 
-	public CassandraRing(String hosts[], Policy policy) {
+	public CassandraRing(String hosts[], HostCyclePolicy policy) {
 		this.policy = policy;
 		this.activeHosts = hostArrayToList(hosts);
 	}

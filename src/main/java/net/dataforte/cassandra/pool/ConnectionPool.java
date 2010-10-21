@@ -76,7 +76,7 @@ public class ConnectionPool {
 	 */
 	private BlockingQueue<PooledConnection> idle;
 	
-	private Map<Cassandra.Iface, PooledConnection> connectionMap;
+	private Map<Cassandra.Client, PooledConnection> connectionMap;
 
 	/**
 	 * The thread that is responsible for checking abandoned and idle threads and for keeping an up-to-date list of Cassandra hosts
@@ -91,7 +91,7 @@ public class ConnectionPool {
 	/**
 	 * reference to the JMX mbean
 	 */
-	protected net.dataforte.cassandra.pool.jmx.ConnectionPool jmxPool = null;
+	protected net.dataforte.cassandra.pool.jmx.ConnectionPoolMBean jmxPool = null;
 
 	/**
 	 * counter to track how many threads are waiting for a connection
@@ -134,7 +134,7 @@ public class ConnectionPool {
 	 *             - if the wait times out or a failure occurs creating a
 	 *             connection
 	 */
-	public Cassandra.Iface getConnection() throws TException {
+	public Cassandra.Client getConnection() throws TException {
 		// check out a connection
 		PooledConnection con = borrowConnection(-1);
 		return con.getConnection();
@@ -273,7 +273,7 @@ public class ConnectionPool {
 	protected void init(PoolConfiguration properties) throws TException {
 		poolProperties = properties;
 		
-		connectionMap = new HashMap<Cassandra.Iface, PooledConnection>();
+		connectionMap = new HashMap<Cassandra.Client, PooledConnection>();
 		
 		cassandraRing = new CassandraRing(poolProperties.getConfiguredHosts());
 		
@@ -323,7 +323,7 @@ public class ConnectionPool {
 
 		} catch (TException x) {
 			if (jmxPool != null)
-				jmxPool.notify(net.dataforte.cassandra.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
+				jmxPool.notify(net.dataforte.cassandra.pool.jmx.ConnectionPoolMBean.NOTIFY_INIT, getStackTrace(x));
 			close(true);
 			throw x;
 		} finally {
@@ -363,7 +363,7 @@ public class ConnectionPool {
 				log.warn("Connection has been abandoned " + con + ":" + trace);
 			}
 			if (jmxPool != null) {
-				jmxPool.notify(net.dataforte.cassandra.pool.jmx.ConnectionPool.NOTIFY_ABANDON, trace);
+				jmxPool.notify(net.dataforte.cassandra.pool.jmx.ConnectionPoolMBean.NOTIFY_ABANDON, trace);
 			}
 			// release the connection
 			release(con);
@@ -398,7 +398,7 @@ public class ConnectionPool {
 						+ trace);
 			}
 			if (jmxPool != null) {
-				jmxPool.notify(net.dataforte.cassandra.pool.jmx.ConnectionPool.SUSPECT_ABANDONED_NOTIFICATION, trace);
+				jmxPool.notify(net.dataforte.cassandra.pool.jmx.ConnectionPoolMBean.SUSPECT_ABANDONED_NOTIFICATION, trace);
 			}
 			con.setSuspect(true);
 		} finally {
@@ -669,7 +669,7 @@ public class ConnectionPool {
 		}
 	}
 
-	public void release(Cassandra.Iface connection) {
+	public void release(Cassandra.Client connection) {
 		PooledConnection pooledConnection = connectionMap.get(connection);
 		this.returnConnection(pooledConnection);
 	}
@@ -953,7 +953,7 @@ public class ConnectionPool {
 	 *         {@link net.dataforte.cassandra.pool.jmx.ConnectionPoolMBean}
 	 *         interface
 	 */
-	public net.dataforte.cassandra.pool.jmx.ConnectionPool getJmxPool() {
+	public net.dataforte.cassandra.pool.jmx.ConnectionPoolMBean getJmxPool() {
 		return jmxPool;
 	}
 
@@ -966,7 +966,7 @@ public class ConnectionPool {
 	 */
 	protected void createMBean() {
 		try {
-			jmxPool = new net.dataforte.cassandra.pool.jmx.ConnectionPool(this);
+			jmxPool = new net.dataforte.cassandra.pool.jmx.ConnectionPoolMBean(this);
 		} catch (Exception x) {
 			log.warn("Unable to start JMX integration for connection pool. Instance[" + getName() + "] can't be monitored.", x);
 		}

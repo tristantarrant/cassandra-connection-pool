@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Represents a pooled connection
- * and holds a reference to the {@link org.apache.cassandra.thrift.Cassandra.Iface} and {@link org.apache.thrift.transport.TTransport} object
+ * and holds a reference to the {@link org.apache.cassandra.thrift.Cassandra.Client} and {@link org.apache.thrift.transport.TTransport} object
  * 
  * Derived from org.apache.tomcat.jdbc.pool.PooledConnection by fhanik
  * 
@@ -77,7 +77,7 @@ public class PooledConnection {
     /**
      * The underlying database connection
      */
-    private volatile Cassandra.Iface connection;
+    private volatile Cassandra.Client connection;
     
     /**
      * The underlying transport for the connection
@@ -145,8 +145,9 @@ public class PooledConnection {
         
         List<CassandraHost> hosts = parent.getCassandraRing().getHosts();
         Iterator<CassandraHost> hostIterator = hosts.iterator();
+        int tried = 0;
         for(this.transport=null; this.transport==null; ) {
-        	if(!hostIterator.hasNext()) {
+        	if(tried>poolProperties.getFailoverPolicy().numRetries || !hostIterator.hasNext()) {
         		throw new TException("Could not connect to any hosts");
         	}
         	CassandraHost host = hostIterator.next();
@@ -164,6 +165,7 @@ public class PooledConnection {
 		        } catch (TTransportException tte) {
 		        	host.setGood(false);
 		        	this.transport = null;
+		        	tried++;
 		        }
         	}
         }
@@ -468,7 +470,7 @@ public class PooledConnection {
      * @return the underlying JDBC connection as it was returned from the JDBC driver
      * @see javax.sql.PooledConnection#getConnection()
      */
-    public Cassandra.Iface getConnection() {
+    public Cassandra.Client getConnection() {
         return this.connection;
     }
         

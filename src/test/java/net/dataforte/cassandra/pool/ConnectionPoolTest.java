@@ -6,7 +6,7 @@ import java.net.URL;
 import java.util.List;
 
 import org.apache.cassandra.service.EmbeddedCassandraService;
-import org.apache.cassandra.thrift.Cassandra.Iface;
+import org.apache.cassandra.thrift.Cassandra;
 import org.apache.thrift.transport.TTransportException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -56,7 +56,7 @@ public class ConnectionPoolTest {
 		Assert.assertEquals(2, pool.getSize());
 		
 		// Get a connection
-		Iface connection = pool.getConnection();
+		Cassandra.Client connection = pool.getConnection();
 		Assert.assertNotNull(connection);
 		
 		Assert.assertEquals(1, pool.getActive());
@@ -86,7 +86,7 @@ public class ConnectionPoolTest {
 		ConnectionPool pool = new ConnectionPool(prop);
 		
 		// Get a connection
-		Iface connection = pool.getConnection();
+		Cassandra.Client connection = pool.getConnection();
 		Assert.assertNotNull(connection);
 		
 		Assert.assertEquals(1, pool.getActive());
@@ -117,7 +117,7 @@ public class ConnectionPoolTest {
 		prop.setAutomaticHostDiscovery(true);
 		ConnectionPool pool = new ConnectionPool(prop);
 		// Get a connection
-		Iface connection = pool.getConnection();
+		Cassandra.Client connection = pool.getConnection();
 		Assert.assertNotNull(connection);
 		CassandraRing cassandraRing = pool.getCassandraRing();
 		
