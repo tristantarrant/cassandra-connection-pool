@@ -195,15 +195,7 @@ public class PoolProperties implements PoolConfiguration {
 	@Override
 	public void setFairQueue(boolean fairQueue) {
 		this.fairQueue = fairQueue;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean isAccessToUnderlyingConnectionAllowed() {
-		return accessToUnderlyingConnectionAllowed;
-	}
+	}	
 
 	@Override
 	public boolean isAutomaticHostDiscovery() {
@@ -378,15 +370,7 @@ public class PoolProperties implements PoolConfiguration {
 	@Override
 	public boolean isTestOnConnect() {
 		return testOnConnect;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setAccessToUnderlyingConnectionAllowed(boolean accessToUnderlyingConnectionAllowed) {
-		// NOOP
-	}
+	}	
 
 	/**
 	 * {@inheritDoc}

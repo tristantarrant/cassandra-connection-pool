@@ -43,7 +43,8 @@ public class ConnectionPool {
 	/**
 	 * Prefix type for JMX registration
 	 */
-	public static final String POOL_JMX_TYPE_PREFIX = "cassandra.pool:type=";
+	public static final String POOL_JMX_PREFIX = "cassandra.pool";
+	public static final String POOL_JMX_TYPE_PREFIX = POOL_JMX_PREFIX+":type=";
 
 	/**
 	 * Logger

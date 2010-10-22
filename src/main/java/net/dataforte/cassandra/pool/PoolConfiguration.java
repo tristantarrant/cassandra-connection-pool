@@ -141,20 +141,6 @@ public interface PoolConfiguration {
     public void setFairQueue(boolean fairQueue);
     
     /**
-     * Property not used. Access is always allowed.
-     * Access can be achieved by calling unwrap on the pooled connection. see {@link javax.sql.DataSource} interface 
-     * or call getConnection through reflection or cast the object as {@link javax.sql.PooledConnection}
-     * @return true
-     */
-    public boolean isAccessToUnderlyingConnectionAllowed();
-
-    /**
-     * No-op
-     * @param accessToUnderlyingConnectionAllowed parameter ignored
-     */
-    public void setAccessToUnderlyingConnectionAllowed(boolean accessToUnderlyingConnectionAllowed);
-       
-    /**
      * Returns the number of connections that will be established when the connection pool is started.
      * Default value is 10 
      * @return number of connections to be started when pool is started

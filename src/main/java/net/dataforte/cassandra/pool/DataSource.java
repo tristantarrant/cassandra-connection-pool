@@ -25,6 +25,7 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+import org.apache.cassandra.thrift.CassandraThriftDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * @author Filip Hanik
  * @version 1.0
  */
-public class DataSource extends DataSourceProxy implements org.apache.cassandra.thrift.CassandraThriftDataSource, MBeanRegistration {
+public class DataSource extends DataSourceProxy implements PoolConfiguration, CassandraThriftDataSource, MBeanRegistration {
 	private static final Logger log = LoggerFactory.getLogger(DataSource.class);
 
 	/**
@@ -110,7 +111,7 @@ public class DataSource extends DataSourceProxy implements org.apache.cassandra.
 	 * @throws MalformedObjectNameException
 	 */
 	public ObjectName createObjectName(ObjectName original) throws MalformedObjectNameException {
-		String domain = "cassandra.pool";
+		String domain = ConnectionPool.POOL_JMX_PREFIX;
 		Hashtable<String, String> properties = original.getKeyPropertyList();
 		String origDomain = original.getDomain();
 		properties.put("type", "ConnectionPool");
@@ -150,4 +151,392 @@ public class DataSource extends DataSourceProxy implements org.apache.cassandra.
 			log.error("Unable to unregister connection pool with JMX", e);
 		}
 	}
+	
+	/**************************************************************************************
+	 * Properties
+	 **************************************************************************************/
+
+	@Override
+	public void set(String name, Object value) {
+		this.poolProperties.set(name, value);
+		
+	}
+
+	@Override
+	public Object get(String name) {
+		return this.poolProperties.get(name);
+	}
+
+	@Override
+	public void setHost(String host) {
+		this.poolProperties.setHost(host);
+		
+	}
+
+	@Override
+	public String getHost() {
+		return this.poolProperties.getHost();
+	}
+
+	@Override
+	public void setPort(int port) {
+		this.poolProperties.setPort(port);		
+	}
+
+	@Override
+	public int getPort() {
+		return this.poolProperties.getPort();
+	}
+
+	@Override
+	public void setFramed(boolean framed) {
+		this.poolProperties.setFramed(framed);
+	}
+
+	@Override
+	public boolean isFramed() {
+		return this.poolProperties.isFramed();
+	}
+
+	@Override
+	public void setAutomaticHostDiscovery(boolean autoDiscovery) {
+		this.poolProperties.setAutomaticHostDiscovery(autoDiscovery);
+	}
+
+	@Override
+	public boolean isAutomaticHostDiscovery() {
+		return this.poolProperties.isAutomaticHostDiscovery();
+	}
+
+	@Override
+	public void setFailoverPolicy(HostFailoverPolicy failoverPolicy) {
+		this.poolProperties.setFailoverPolicy(failoverPolicy);
+		
+	}
+
+	@Override
+	public HostFailoverPolicy getFailoverPolicy() {
+		return this.poolProperties.getFailoverPolicy();
+	}
+
+	@Override
+	public void setAbandonWhenPercentageFull(int percentage) {
+		this.poolProperties.setAbandonWhenPercentageFull(percentage);
+	}
+
+	@Override
+	public int getAbandonWhenPercentageFull() {
+		return this.poolProperties.getAbandonWhenPercentageFull();
+	}
+
+	@Override
+	public boolean isFairQueue() {
+		return this.poolProperties.isFairQueue();
+	}
+
+	@Override
+	public void setFairQueue(boolean fairQueue) {
+		this.poolProperties.setFairQueue(fairQueue);
+	}
+
+	@Override
+	public int getInitialSize() {
+		return this.poolProperties.getInitialSize();
+	}
+
+	@Override
+	public void setInitialSize(int initialSize) {
+		this.poolProperties.setInitialSize(initialSize);
+	}
+
+	@Override
+	public boolean isLogAbandoned() {
+		return this.poolProperties.isLogAbandoned();
+	}
+
+	@Override
+	public void setLogAbandoned(boolean logAbandoned) {
+		this.poolProperties.setLogAbandoned(logAbandoned);
+	}
+
+	@Override
+	public int getMaxActive() {
+		return this.poolProperties.getMaxActive();
+	}
+
+	@Override
+	public void setMaxActive(int maxActive) {
+		this.poolProperties.setMaxActive(maxActive);
+	}
+
+	@Override
+	public int getMaxIdle() {
+		return this.poolProperties.getMaxIdle();
+	}
+
+	@Override
+	public void setMaxIdle(int maxIdle) {
+		this.poolProperties.setMaxIdle(maxIdle);
+	}
+
+	@Override
+	public int getMaxWait() {
+		return this.poolProperties.getMaxWait();
+	}
+
+	@Override
+	public void setMaxWait(int maxWait) {
+		this.poolProperties.setMaxWait(maxWait);
+		
+	}
+
+	@Override
+	public int getMinEvictableIdleTimeMillis() {
+		return this.poolProperties.getMinEvictableIdleTimeMillis();
+	}
+
+	@Override
+	public void setMinEvictableIdleTimeMillis(int minEvictableIdleTimeMillis) {
+		this.poolProperties.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
+	}
+
+	@Override
+	public int getMinIdle() {
+		return this.poolProperties.getMinIdle();
+	}
+
+	@Override
+	public void setMinIdle(int minIdle) {
+		this.poolProperties.setMinIdle(minIdle);
+	}
+
+	@Override
+	public String getName() {
+		return this.poolProperties.getName();
+	}
+
+	@Override
+	public void setName(String name) {
+		this.poolProperties.setName(name);
+		
+	}
+
+	@Override
+	public int getNumTestsPerEvictionRun() {
+		return this.poolProperties.getNumTestsPerEvictionRun();
+	}
+
+	@Override
+	public void setNumTestsPerEvictionRun(int numTestsPerEvictionRun) {
+		this.poolProperties.setNumTestsPerEvictionRun(numTestsPerEvictionRun);
+	}
+
+	@Override
+	public String getPassword() {
+		return this.poolProperties.getPassword();
+	}
+
+	@Override
+	public void setPassword(String password) {
+		this.poolProperties.setPassword(password);
+	}
+
+	@Override
+	public String getPoolName() {
+		return this.poolProperties.getPoolName();
+	}
+
+	@Override
+	public String getUsername() {
+		return this.poolProperties.getUsername();
+	}
+
+	@Override
+	public void setUsername(String username) {
+		this.poolProperties.setUsername(username);
+		
+	}
+
+	@Override
+	public boolean isRemoveAbandoned() {
+		return this.poolProperties.isRemoveAbandoned();
+	}
+
+	@Override
+	public void setRemoveAbandoned(boolean removeAbandoned) {
+		this.poolProperties.setRemoveAbandoned(removeAbandoned);
+	}
+
+	@Override
+	public void setRemoveAbandonedTimeout(int removeAbandonedTimeout) {
+		this.poolProperties.setRemoveAbandonedTimeout(removeAbandonedTimeout);
+	}
+
+	@Override
+	public int getRemoveAbandonedTimeout() {
+		return this.poolProperties.getRemoveAbandonedTimeout();
+	}
+
+	@Override
+	public boolean isTestOnBorrow() {
+		return this.poolProperties.isTestOnBorrow();
+	}
+
+	@Override
+	public void setTestOnBorrow(boolean testOnBorrow) {
+		this.poolProperties.setTestOnBorrow(testOnBorrow);
+	}
+
+	@Override
+	public boolean isTestOnReturn() {
+		return this.poolProperties.isTestOnBorrow();
+	}
+
+	@Override
+	public void setTestOnReturn(boolean testOnReturn) {
+		this.poolProperties.setTestOnReturn(testOnReturn);
+	}
+
+	@Override
+	public boolean isTestWhileIdle() {
+		return this.poolProperties.isTestWhileIdle();
+	}
+
+	@Override
+	public void setTestWhileIdle(boolean testWhileIdle) {
+		this.poolProperties.setTestWhileIdle(testWhileIdle);
+	}
+
+	@Override
+	public int getTimeBetweenEvictionRunsMillis() {
+		return this.poolProperties.getTimeBetweenEvictionRunsMillis();
+	}
+
+	@Override
+	public void setTimeBetweenEvictionRunsMillis(int timeBetweenEvictionRunsMillis) {
+		this.poolProperties.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
+	}
+
+	@Override
+	public long getValidationInterval() {
+		return this.poolProperties.getValidationInterval();
+	}
+
+	@Override
+	public void setValidationInterval(long validationInterval) {
+		this.poolProperties.setValidationInterval(validationInterval);
+	}
+
+	@Override
+	public boolean isTestOnConnect() {
+		return this.poolProperties.isTestOnConnect();
+	}
+
+	@Override
+	public void setTestOnConnect(boolean testOnConnect) {
+		this.poolProperties.setTestOnConnect(testOnConnect);
+	}
+
+	@Override
+	public boolean isJmxEnabled() {
+		return this.poolProperties.isJmxEnabled();
+	}
+
+	@Override
+	public void setJmxEnabled(boolean jmxEnabled) {
+		this.poolProperties.setJmxEnabled(jmxEnabled);
+	}
+
+	@Override
+	public boolean isPoolSweeperEnabled() {
+		return this.poolProperties.isPoolSweeperEnabled();
+	}
+
+	@Override
+	public boolean isUseEquals() {
+		return this.poolProperties.isUseEquals();
+	}
+
+	@Override
+	public void setUseEquals(boolean useEquals) {
+		this.poolProperties.setUseEquals(useEquals);
+	}
+
+	@Override
+	public long getMaxAge() {
+		return this.poolProperties.getMaxAge();
+	}
+
+	@Override
+	public void setMaxAge(long maxAge) {
+		this.poolProperties.setMaxAge(maxAge);
+	}
+
+	@Override
+	public boolean getUseLock() {
+		return this.poolProperties.getUseLock();
+	}
+
+	@Override
+	public void setUseLock(boolean useLock) {
+		this.poolProperties.setUseLock(useLock);
+	}
+
+	@Override
+	public void setSuspectTimeout(int seconds) {
+		this.poolProperties.setSuspectTimeout(seconds);
+	}
+
+	@Override
+	public int getSuspectTimeout() {
+		return this.poolProperties.getSuspectTimeout();
+	}
+
+	@Override
+	public int getSocketTimeout() {
+		return this.poolProperties.getSocketTimeout();
+	}
+
+	@Override
+	public void setSocketTimeout(int socketTimeout) {
+		this.poolProperties.setSocketTimeout(socketTimeout);
+	}
+
+	@Override
+	public String[] getConfiguredHosts() {
+		return this.poolProperties.getConfiguredHosts();
+	}
+
+	@Override
+	public long getHostRetryInterval() {
+		return this.poolProperties.getHostRetryInterval();
+	}
+
+	@Override
+	public void setHostRetryInterval(long hostRetryInterval) {
+		this.poolProperties.setHostRetryInterval(hostRetryInterval);
+	}
+
+	@Override
+	public void setDataSourceJNDI(String jndiDS) {
+		this.poolProperties.setDataSourceJNDI(jndiDS);
+	}
+
+	@Override
+	public String getDataSourceJNDI() {
+		return this.poolProperties.getDataSourceJNDI();
+	}
+
+	@Override
+	public void setDataSource(Object ds) {
+		this.poolProperties.setDataSource(ds);
+	}
+
+	@Override
+	public Object getDataSource() {
+		return this.poolProperties.getDataSource();
+	}
+	
+
+	
 }
