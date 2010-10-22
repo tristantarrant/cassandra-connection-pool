@@ -44,6 +44,7 @@ public class DataSourceProxy {
 	public DataSourceProxy(PoolConfiguration poolProperties) {
 		if (poolProperties == null)
 			throw new NullPointerException("PoolConfiguration can not be null.");
+		this.poolProperties = poolProperties;
 
 	}
 
@@ -90,7 +91,9 @@ public class DataSourceProxy {
 		pool.release(connection);
 	}
 
-	public ConnectionPool getPool() {
+	public ConnectionPool getPool() throws TException {
+		if (pool == null)
+			return createPool();
 		return pool;
 	}
 

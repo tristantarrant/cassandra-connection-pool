@@ -18,13 +18,13 @@
 
 	<InitialToken></InitialToken>
 
-	<SavedCachesDirectory>${java.io.tmpdir}/cassandra-connection-pool/saved_caches</SavedCachesDirectory>
-	<CommitLogDirectory>${java.io.tmpdir}/cassandra-connection-pool/commitlog</CommitLogDirectory>
+	<SavedCachesDirectory>${java.io.tmpdir}/${project.artifactId}-1/saved_caches</SavedCachesDirectory>
+	<CommitLogDirectory>${java.io.tmpdir}/${project.artifactId}-1/commitlog</CommitLogDirectory>
 	<DataFileDirectories>
-		<DataFileDirectory>${java.io.tmpdir}/cassandra-connection-pool/data</DataFileDirectory>
+		<DataFileDirectory>${java.io.tmpdir}/${project.artifactId}-1/data</DataFileDirectory>
 	</DataFileDirectories>
-	<CalloutLocation>${java.io.tmpdir}/cassandra-connection-pool/callouts</CalloutLocation>
-	<StagingFileDirectory>${java.io.tmpdir}/cassandra-connection-pool/staging</StagingFileDirectory>
+	<CalloutLocation>${java.io.tmpdir}/${project.artifactId}-1/callouts</CalloutLocation>
+	<StagingFileDirectory>${java.io.tmpdir}/${project.artifactId}-1/staging</StagingFileDirectory>
 
 	<Seeds>
 		<Seed>127.0.0.1</Seed>
