@@ -8,7 +8,9 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.cassandra.thrift.Cassandra;
+import org.apache.cassandra.thrift.InvalidRequestException;
 import org.apache.cassandra.thrift.TokenRange;
+import org.apache.thrift.TException;
 
 public class CassandraRing {
 	private HostCyclePolicy policy;
@@ -32,41 +34,45 @@ public class CassandraRing {
 		return list;
 	}
 
-	public synchronized void refresh(Cassandra.Iface connection) {
-		try {
-			// Obtain a set of available keyspaces
-			Set<String> ks = connection.describe_keyspaces();
-			String keyspace = null;
-			for (String k : ks) {
-				if (!"system".equalsIgnoreCase(k)) {
-					keyspace = k;
-					break;
-				}
+	public synchronized void refresh(Cassandra.Iface connection) throws TException, InvalidRequestException {
+
+		// Obtain a set of available keyspaces
+		Set<String> ks = connection.describe_keyspaces();
+		String keyspace = null;
+		for (String k : ks) {
+			if (!"system".equalsIgnoreCase(k)) {
+				keyspace = k;
+				break;
 			}
-			// Get a token range for the keyspace
-			List<TokenRange> ranges = connection.describe_ring(keyspace);
-			Set<String> addresses = new HashSet<String>();
-			// Cycle all of the token ranges adding the endpoint addresses to a
-			// set, so that duplicates are discarded
-			for (TokenRange range : ranges) {
-				addresses.addAll(range.getEndpoints());
-			}
-			activeHosts = hostArrayToList(addresses.toArray(new String[] {}));
-		} catch (Exception e) {
 		}
+		// Get a token range for the keyspace
+		List<TokenRange> ranges = connection.describe_ring(keyspace);
+		Set<String> addresses = new HashSet<String>();
+		// Cycle all of the token ranges adding the endpoint addresses to a
+		// set, so that duplicates are discarded
+		for (TokenRange range : ranges) {
+			addresses.addAll(range.getEndpoints());
+		}
+		activeHosts = hostArrayToList(addresses.toArray(new String[] {}));
+
 	}
 
 	public List<CassandraHost> getHosts() {
-		// Returns a list of hosts ordered according to the policy		
-		switch(this.policy) {
-		case RANDOM:			
+		// Returns a list of hosts ordered according to the policy
+		switch (this.policy) {
+		case RANDOM:
 			List<CassandraHost> list = new ArrayList<CassandraHost>(activeHosts);
 			Collections.shuffle(list, random);
 			return list;
 		case ROUND_ROBIN:
 		default:
-			return new OffsetArrayList<CassandraHost>(activeHosts, random.nextInt(activeHosts.size()));			
+			return new OffsetArrayList<CassandraHost>(activeHosts, random.nextInt(activeHosts.size()));
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "CassandraRing [policy=" + policy + ", random=" + random + ", activeHosts=" + activeHosts + "]";
 	}
 
 }

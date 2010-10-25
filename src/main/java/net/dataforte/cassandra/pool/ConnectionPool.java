@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.cassandra.thrift.Cassandra;
 import org.apache.thrift.TException;
+import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -873,10 +874,18 @@ public class ConnectionPool {
 					if (busy.contains(con))
 						continue;
 					cassandraRing.refresh(con.getConnection());
+					// we have successfully refreshed the ring, we can quit now
+					log.debug("refreshRing success, ring = "+cassandraRing);
+					return;
+				} catch (TTransportException t) {
+					// there was an error retrieving ring information from this connection, remove it
+					log.warn("removing connection to non-responding host ");
+					idle.remove(con);
+					release(con);
 				} finally {
 					con.unlock();
 				}
-			} // while
+			} // while			
 		} catch (ConcurrentModificationException e) {
 			log.debug("refreshRing failed.", e);
 		} catch (Exception e) {
@@ -1014,6 +1023,9 @@ public class ConnectionPool {
 							pool.checkIdle();
 						if (pool.getPoolProperties().isTestWhileIdle())
 							pool.testAllIdle();
+						if (pool.getPoolProperties().isAutomaticHostDiscovery()) {
+							pool.refreshRing();
+						}
 					} catch (Exception x) {
 						log.error("", x);
 					} // catch
