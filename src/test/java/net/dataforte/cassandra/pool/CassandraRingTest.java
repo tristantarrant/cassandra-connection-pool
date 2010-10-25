@@ -17,26 +17,26 @@ public class CassandraRingTest {
 		prop.setLogAbandoned(true);
 		prop.setJmxEnabled(true);
 		prop.setAutomaticHostDiscovery(true);
-		ConnectionPool pool = new ConnectionPool(prop);
+		DataSource ds = new DataSource(prop);
 		
-		Client connection = pool.getConnection();
+		Client connection = ds.getConnection();
 		Thread.sleep(1000);
-		pool.release(connection);
+		ds.releaseConnection(connection);
 	
 		Thread.sleep(6000);
 		
-		connection = pool.getConnection();
+		connection = ds.getConnection();
 		Thread.sleep(1000);
-		pool.release(connection);
+		ds.releaseConnection(connection);
 		
 		Thread.sleep(6000);
 		
-		connection = pool.getConnection();
+		connection = ds.getConnection();
 		Thread.sleep(1000);
-		pool.release(connection);
+		ds.releaseConnection(connection);
 		
 		Thread.sleep(6000);
 		
-		pool.close();
+		ds.close();
 	}
 }
