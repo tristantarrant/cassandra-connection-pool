@@ -163,8 +163,9 @@ public class PooledConnection {
 					this.transport.open();
 					host.setGood(true);
 		        } catch (TTransportException tte) {
-		        	log.warn("Failed connection to "+host);
+		        	host.timestamp();
 		        	host.setGood(false);
+		        	log.warn("Failed connection to "+host);		        	
 		        	this.transport = null;
 		        	tried++;
 		        }

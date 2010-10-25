@@ -1,12 +1,29 @@
 package net.dataforte.cassandra.pool;
 
+import java.util.Random;
+
 import org.apache.cassandra.thrift.Cassandra.Client;
 import org.junit.Ignore;
 
 @Ignore
 public class CassandraRingTest {
+	
+	static DataSource ds;
 
 	public static final void main(String args[]) throws Exception {
+		
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+
+			@Override
+			public void run() {
+				if(ds!=null) {
+					System.out.println("Shutting down...");
+					ds.close();
+				}
+			}
+			
+		});
+		
 		PoolConfiguration prop = new PoolProperties();
 		prop.setHost("192.168.56.241");
 		prop.setInitialSize(2);
@@ -17,26 +34,23 @@ public class CassandraRingTest {
 		prop.setLogAbandoned(true);
 		prop.setJmxEnabled(true);
 		prop.setAutomaticHostDiscovery(true);
-		DataSource ds = new DataSource(prop);
+		prop.setTestOnBorrow(true);
+		prop.setTestOnReturn(true);
 		
-		Client connection = ds.getConnection();
-		Thread.sleep(1000);
-		ds.releaseConnection(connection);
-	
-		Thread.sleep(6000);
+		ds = new DataSource(prop);
+		Random random = new Random();
+		for(;;) {
+			Client connections[] = new Client[random.nextInt(prop.getMaxActive()-1)+1];
+			System.out.println("Getting "+connections.length+" connections...");
+			for(int i=0; i<connections.length; i++) {
+				connections[i] = ds.getConnection();
+			}
+			Thread.sleep(1000);
+			for(int i=0; i<connections.length; i++) {
+				ds.releaseConnection(connections[i]);
+			}
 		
-		connection = ds.getConnection();
-		Thread.sleep(1000);
-		ds.releaseConnection(connection);
-		
-		Thread.sleep(6000);
-		
-		connection = ds.getConnection();
-		Thread.sleep(1000);
-		ds.releaseConnection(connection);
-		
-		Thread.sleep(6000);
-		
-		ds.close();
+			Thread.sleep(6000);
+		}
 	}
 }

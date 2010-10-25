@@ -2,8 +2,10 @@ package net.dataforte.cassandra.pool;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -15,7 +17,7 @@ import org.apache.thrift.TException;
 public class CassandraRing {
 	private HostCyclePolicy policy;
 	private Random random = new Random();
-	private List<CassandraHost> activeHosts;
+	private Map<String, CassandraHost> hosts;
 
 	public CassandraRing(String hosts[]) {
 		this(hosts, HostCyclePolicy.RANDOM);
@@ -23,15 +25,25 @@ public class CassandraRing {
 
 	public CassandraRing(String hosts[], HostCyclePolicy policy) {
 		this.policy = policy;
-		this.activeHosts = hostArrayToList(hosts);
+		this.hosts = hostArrayToMap(hosts);
 	}
-
-	private List<CassandraHost> hostArrayToList(String hosts[]) {
-		List<CassandraHost> list = new ArrayList<CassandraHost>();
-		for (String host : hosts) {
-			list.add(new CassandraHost(host));
+	
+	/**
+	 * Maintain the host map, preserving any information about previously known hosts
+	 * 
+	 * @param hostAddresses
+	 * @return 
+	 */
+	private Map<String, CassandraHost> hostArrayToMap(String hostAddresses[]) {
+		Map<String, CassandraHost> hostsMap = new HashMap<String, CassandraHost>();
+		for(String hostAddress : hostAddresses) {
+			CassandraHost host = hosts==null?null:hosts.get(hostAddress);
+			if(host==null) {
+				host = new CassandraHost(hostAddress);
+			}
+			hostsMap.put(hostAddress, host);
 		}
-		return list;
+		return hostsMap;
 	}
 
 	public synchronized void refresh(Cassandra.Iface connection) throws TException, InvalidRequestException {
@@ -53,7 +65,7 @@ public class CassandraRing {
 		for (TokenRange range : ranges) {
 			addresses.addAll(range.getEndpoints());
 		}
-		activeHosts = hostArrayToList(addresses.toArray(new String[] {}));
+		this.hosts = hostArrayToMap(addresses.toArray(new String[] {}));
 
 	}
 
@@ -61,18 +73,18 @@ public class CassandraRing {
 		// Returns a list of hosts ordered according to the policy
 		switch (this.policy) {
 		case RANDOM:
-			List<CassandraHost> list = new ArrayList<CassandraHost>(activeHosts);
+			List<CassandraHost> list = new ArrayList<CassandraHost>(hosts.values());
 			Collections.shuffle(list, random);
 			return list;
 		case ROUND_ROBIN:
 		default:
-			return new OffsetArrayList<CassandraHost>(activeHosts, random.nextInt(activeHosts.size()));
+			return new OffsetArrayList<CassandraHost>(hosts.values(), random.nextInt(hosts.size()));
 		}
 	}
 
 	@Override
 	public String toString() {
-		return "CassandraRing [policy=" + policy + ", random=" + random + ", activeHosts=" + activeHosts + "]";
+		return "CassandraRing [policy=" + policy + ", activeHosts=" + hosts.values() + "]";
 	}
 
 }
