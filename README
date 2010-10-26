@@ -11,6 +11,8 @@ Because of this it supports the following features:
 - connection validation on borrow and return
 - abandoned connection detection
 - JMX MBean for easy monitoring
+
+It also supports Cassandra Ring discovery with different failover policies
 	
 Most of the code was writtern by Filip Hanik, so the credit should go to him.
 
