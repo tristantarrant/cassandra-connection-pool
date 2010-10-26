@@ -7,7 +7,9 @@ import java.util.List;
 
 import org.apache.cassandra.service.EmbeddedCassandraService;
 import org.apache.cassandra.thrift.Cassandra;
+import org.apache.cassandra.thrift.CassandraDaemon;
 import org.apache.thrift.transport.TTransportException;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -15,6 +17,7 @@ import org.junit.Test;
 public class ConnectionPoolTest {
 
 	private static EmbeddedCassandraService cassandra;
+	private static Thread t;
 
 	/**
 	 * Set embedded cassandra up and spawn it in a new thread.
@@ -34,11 +37,19 @@ public class ConnectionPoolTest {
 
 		CassandraServiceDataCleaner cleaner = new CassandraServiceDataCleaner();
 		cleaner.prepare();
+		CassandraDaemon d = null;
+		
 		cassandra = new EmbeddedCassandraService();
 		cassandra.init();
-		Thread t = new Thread(cassandra);
+		
+		t = new Thread(cassandra);
 		t.setDaemon(true);
 		t.start();
+	}
+	
+	@AfterClass
+	public static void tearDown() {
+		System.exit(0);
 	}
 
 	@Test

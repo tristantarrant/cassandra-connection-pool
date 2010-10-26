@@ -7,6 +7,7 @@ import java.net.URL;
 import org.apache.cassandra.service.EmbeddedCassandraService;
 import org.apache.cassandra.thrift.Cassandra;
 import org.apache.thrift.transport.TTransportException;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -38,6 +39,11 @@ public class DataSourceTest {
 		Thread t = new Thread(cassandra);
 		t.setDaemon(true);
 		t.start();
+	}
+	
+	@AfterClass
+	public static void tearDown() {
+		System.exit(0);
 	}
 
 	@Test
