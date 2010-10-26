@@ -7,7 +7,7 @@
   <skin>
     <groupId>net.dataforte.maven.skins</groupId>
     <artifactId>dataforte-skin</artifactId>
-    <version>1</version>
+    <version>2</version>
   </skin>
   
 

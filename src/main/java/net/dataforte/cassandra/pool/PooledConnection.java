@@ -263,28 +263,12 @@ public class PooledConnection {
             return false;
     }
 
-    /**Returns true if the object is still valid. if not
+    /**
+     * Returns true if the object is still valid. if not
      * the pool will call the getExpiredAction() and follow up with one
      * of the four expired methods
      */
     public boolean validate(int validateAction) {
-        return validate(validateAction,null);
-    }
-
-    /**
-     * Validates a connection. 
-     * @param validateAction the action used. One of {@link #VALIDATE_BORROW}, {@link #VALIDATE_IDLE}, 
-     * {@link #VALIDATE_INIT} or {@link #VALIDATE_RETURN}
-     * @param sql the SQL to be used during validation. If the {@link PoolConfiguration#setInitSQL(String)} has been called with a non null 
-     * value and the action is {@link #VALIDATE_INIT} the init SQL will be used for validation.
-     *  
-     * @return true if the connection was validated successfully. It returns true even if validation was not performed, such as when 
-     * {@link PoolConfiguration#setValidationInterval(long)} has been called with a positive value. 
-     * <p>
-     * false if the validation failed. The caller should close the connection if false is returned since a session could have been left in 
-     * an unknown state during initialization.
-     */
-    public boolean validate(int validateAction,String sql) {
         if (this.isDiscarded()) {
             return false;
         }
@@ -411,7 +395,7 @@ public class PooledConnection {
     /**
      * Return the timestamps of last pool action. Timestamps are typically set when connections 
      * are borrowed from the pool. It is used to keep track of {@link PoolConfiguration#setRemoveAbandonedTimeout(int) abandon-timeouts}.
-     * This timestamp can also be reset by the {@link org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer#invoke(Object, java.lang.reflect.Method, Object[])}   
+     *    
      * @return the timestamp of the last pool action as defined by {@link System#currentTimeMillis()}
      */
     public long getTimestamp() {

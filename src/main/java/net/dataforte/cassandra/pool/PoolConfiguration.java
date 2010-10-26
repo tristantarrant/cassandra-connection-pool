@@ -16,6 +16,7 @@
  */
 package net.dataforte.cassandra.pool;
 
+
 /**
  * A list of properties that are configurable for a connection pool.
  * 
@@ -49,9 +50,9 @@ public interface PoolConfiguration {
     public void setHost(String host);
     
     /**
-     * Returns the Cassandra host
+     * Returns the Cassandra hosts
      * 
-     * @return
+     * @return a single string representing the Cassandra host addresses separated by commas
      */
     public String getHost();
     
@@ -64,7 +65,8 @@ public interface PoolConfiguration {
     
     /**
      * Returns the Cassandra port (defaults to 9160)
-     * @return
+     * 
+     * @return the Cassandra port
      */
     public int getPort();
     
@@ -76,7 +78,7 @@ public interface PoolConfiguration {
     
     /**
      * Returns whether framed connection mode is being used
-     * @return
+     * @return whether framed connection mode is being used
      */
     public boolean isFramed();
     
@@ -87,8 +89,9 @@ public interface PoolConfiguration {
     public void setAutomaticHostDiscovery(boolean autoDiscovery);
     
     /**
-     * Returns whether automatic host discovery is on
-     * @return
+     * Returns whether automatic host discovery is being used
+     * 
+     * @return whether automatic host discovery is being used
      */
     public boolean isAutomaticHostDiscovery();
     
@@ -100,7 +103,7 @@ public interface PoolConfiguration {
     /**
      * Returns the failover policy.
      * 
-     * @return
+     * @return the failover policy
      */
     public HostFailoverPolicy getFailoverPolicy();
 
@@ -286,9 +289,8 @@ public interface PoolConfiguration {
     
     /**
      * Sets the password to establish the connection with.
-     * The password will be included as a database property with the name 'password'.
+     * 
      * @param password 
-     * @see #getDbProperties()
      */
     public void setPassword(String password);
 
@@ -306,9 +308,8 @@ public interface PoolConfiguration {
 
     /**
      * Sets the username used to establish the connection with
-     * It will also be a property called 'user' in the database properties.
-     * @param username
-     * @see #getDbProperties()
+     * 
+     * @param username 
      */
     public void setUsername(String username);
 
@@ -338,15 +339,13 @@ public interface PoolConfiguration {
     /**
      * The time in seconds before a connection can be considered abandoned.
      * The timer can be reset upon queries using an interceptor.
-     * @param removeAbandonedTimeout the time in seconds before a used connection can be considered abandoned
-     * @see org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer
+     * @param removeAbandonedTimeout the time in seconds before a used connection can be considered abandoned     * 
      */
     public void setRemoveAbandonedTimeout(int removeAbandonedTimeout);
 
     /**
      * The time in seconds before a connection can be considered abandoned.
-     * The timer can be reset upon queries using an interceptor.
-     * @see org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer
+     * The timer can be reset upon queries using an interceptor. 
      * @return the time in seconds before a used connection can be considered abandoned
      */ 
     public int getRemoveAbandonedTimeout();
@@ -448,21 +447,21 @@ public interface PoolConfiguration {
     
     /**
      * Returns true if we should run the validation query when connecting to the database for the first time on a connection.
-     * Normally this is always set to false, unless one wants to use the validationQuery as an init query.
+     * Normally this is always set to false.
      * @return true if we should run the validation query upon connect
      */
     public boolean isTestOnConnect();
 
     /**
      * Set to true if we should run the validation query when connecting to the database for the first time on a connection.
-     * Normally this is always set to false, unless one wants to use the validationQuery as an init query.
-     * Setting an {@link #setInitSQL(String)} will override this setting, as the init SQL will be used instead of the validation query
+     * Normally this is always set to false.
+     * 
      * @param testOnConnect set to true if we should run the validation query upon connect
      */
     public void setTestOnConnect(boolean testOnConnect);
     
     /**
-     * If set to true, the connection pool creates a {@link org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean} object 
+     * If set to true, the connection pool creates a {@link net.dataforte.cassandra.pool.jmx.ConnectionPoolMBean} object 
      * that can be registered with JMX to receive notifications and state about the pool.
      * The ConnectionPool object doesn't register itself, as there is no way to keep a static non changing ObjectName across JVM restarts.
      * @return true if the mbean object will be created upon startup.
@@ -470,7 +469,7 @@ public interface PoolConfiguration {
     public boolean isJmxEnabled();
 
     /**
-     * If set to true, the connection pool creates a {@link org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean} object 
+     * If set to true, the connection pool creates a {@link net.dataforte.cassandra.pool.jmx.ConnectionPoolMBean} object 
      * that can be registered with JMX to receive notifications and state about the pool.
      * The ConnectionPool object doesn't register itself, as there is no way to keep a static non changing ObjectName across JVM restarts.
      * @param jmxEnabled set to to if the mbean object should be created upon startup.
@@ -572,7 +571,8 @@ public interface PoolConfiguration {
 
     /**
      * Returns the socket timeout in milliseconds
-     * @return
+     * 
+     * @return the socket timeout in milliseconds
      */
 	int getSocketTimeout();
 
@@ -584,16 +584,17 @@ public interface PoolConfiguration {
 	void setSocketTimeout(int socketTimeout);
 
 	/**
-	 * Returns the list of configured hosts (may be different from the actual list if dynamic discovery is enabled
+	 * Returns an array of configured hosts (may be different from the actual list if dynamic discovery is enabled)
 	 * 
-	 * @return
+	 * @return an array of strings representing the addresses of the configured Cassandra hosts
 	 */
 	String[] getConfiguredHosts();
 
 	/**
 	 * Returns the interval in milliseconds before retrying a host to which a connection has failed in the past.
 	 * Default is 300000 (5 minutes)
-	 * @return
+	 * 
+	 * @return milliseconds before host retry
 	 */
 	public long getHostRetryInterval();
 	

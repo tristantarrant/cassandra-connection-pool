@@ -1,0 +1,16 @@
+Cassandra Connection Pool
+
+	The Cassandra Connection Pool is derived from the jdbc-pool project developed by Filip Hanik as part of Tomcat 7. Its purpose
+	is to provide a flexible and scalable method for pooling connections to a Cassandra cluster. It provides the following features:
+	
+	* possibility to define the maximum number of active connections, maximum and minimum number of idle connections
+	
+	* connection validation on create, borrow, release and periodically on idle connections
+	
+	* host failover policy (fail fast, single host, all hosts) 
+	
+	* automatic retrieval of the addresses of the hosts belonging to a Cassandra cluster
+	
+	* JMX bean for monitoring and configuring via management consoles
+	
+	* configurable via IoC containers (e.g. Spring)
