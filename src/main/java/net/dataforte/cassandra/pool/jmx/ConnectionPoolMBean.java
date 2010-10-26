@@ -95,7 +95,10 @@ public class ConnectionPoolMBean extends NotificationBroadcasterSupport implemen
 		try {
 			BeanInfo beanInfo = Introspector.getBeanInfo(PoolProperties.class);
 			for (PropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
-				attributes.add(new MBeanAttributeInfo(pd.getName(), pd.getPropertyType().getName(), pd.getDisplayName(), true, true, false));
+				// skip a few "sensitive" attributes
+				if(!("password".equals(pd.getName())||"class".equals(pd.getName()))) {
+					attributes.add(new MBeanAttributeInfo(pd.getName(), pd.getPropertyType().getName(), pd.getDisplayName(), true, true, false));
+				}
 			}
 		} catch(Exception e) {
 			// Should not happen
