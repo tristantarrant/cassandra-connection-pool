@@ -1,20 +1,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
 	<parent>
 		<groupId>net.dataforte</groupId>
 		<artifactId>dataforte-parent</artifactId>
-		<version>4</version>
+		<version>5</version>
 	</parent>
 
-	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.dataforte.cassandra</groupId>
 	<version>0.3.0-SNAPSHOT</version>
 	<artifactId>cassandra-connection-pool</artifactId>
 	<packaging>jar</packaging>
+
 	<name>Cassandra Connection Pool</name>
+	<description>Cassandra Connection Pool: a flexible, robust connection pool for Apache Cassandra</description>
 	<url>http://www.dataforte.net/software/${project.artifactId}</url>
 
-	<description>Cassandra Connection Pool: a flexible, robust connection pool for Apache Cassandra</description>
+
 	<contributors>
 		<contributor>
 			<name>Tristan Tarrant</name>
@@ -28,7 +31,7 @@
 		<site>
 			<id>ftp.dataforte.net</id>
 			<name>Dataforte site</name>
-			<url>ftp://ftp.dataforte.net/www.dataforte.net/software/${project.artifactId}/</url>
+			<url>ftp://ftp.dataforte.net/www.dataforte.net/software/</url>
 		</site>
 	</distributionManagement>
 
