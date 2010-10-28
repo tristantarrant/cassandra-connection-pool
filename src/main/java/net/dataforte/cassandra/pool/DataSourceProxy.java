@@ -1,12 +1,11 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+/**
+ * Copyright 2010 Tristan Tarrant
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package net.dataforte.cassandra.pool;
 
 import org.apache.cassandra.thrift.Cassandra;
-import org.apache.cassandra.thrift.Cassandra.Client;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,13 +24,10 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  * The DataSource proxy lets us implements methods that don't exist in the
- * current compiler JDK but might be methods that are part of a future JDK
- * DataSource interface. <br/>
+ * current CassandraThriftDataSource interface but might be methods that are 
+ * part of a future CassandraThriftDataSource interface. <br/>
  * 
- * @author Filip Hanik
  * @author Tristan Tarrant
- * 
- * @version 1.0
  */
 
 public class DataSourceProxy {
@@ -46,13 +42,6 @@ public class DataSourceProxy {
 			throw new NullPointerException("PoolConfiguration can not be null.");
 		this.poolProperties = poolProperties;
 
-	}
-
-	/**
-	 * {@link javax.sql.DataSource#getConnection()}
-	 */
-	public Cassandra.Client getConnection(String username, String password) throws TException {
-		return getConnection();
 	}
 
 	public PoolConfiguration getPoolProperties() {
@@ -74,10 +63,6 @@ public class DataSourceProxy {
 		}
 	}
 
-	/**
-	 * {@link javax.sql.DataSource#getConnection()}
-	 */
-
 	public Cassandra.Client getConnection() throws TException {
 		if (pool == null)
 			return createPool().getConnection();
@@ -85,7 +70,7 @@ public class DataSourceProxy {
 	}
 
 	
-	public void releaseConnection(Client connection) {
+	public void releaseConnection(Cassandra.Client connection) {
 		if(pool == null) 
 			throw new IllegalStateException("Attempt to release a connection on an uninitialized pool");
 		pool.release(connection);
