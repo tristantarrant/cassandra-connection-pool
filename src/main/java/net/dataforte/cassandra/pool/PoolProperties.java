@@ -46,7 +46,7 @@ public class PoolProperties implements PoolConfiguration {
 	protected String[] configuredHosts;
 	protected int port = DEFAULT_THRIFT_PORT;
 	protected boolean framed = false;
-	protected boolean automaticHostDiscovery = true;
+	protected boolean automaticHostDiscovery = false;
 	protected HostFailoverPolicy failoverPolicy = HostFailoverPolicy.ON_FAIL_TRY_ALL_AVAILABLE;
 	protected int socketTimeout = 5000;
 
