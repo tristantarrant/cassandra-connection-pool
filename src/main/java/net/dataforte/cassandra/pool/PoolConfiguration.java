@@ -57,6 +57,21 @@ public interface PoolConfiguration {
     public String getHost();
     
     /**
+     * Sets the Cassandra connection URL.
+     * The url is in the form cassandra:thrift://[host]:[port]
+     * 
+     * @param url
+     */
+    public void setUrl(String url);
+    
+    /**
+     * Returns the Cassandra connection URL
+     * 
+     * @return
+     */
+    public String getUrl();
+    
+    /**
      * Sets the Cassandra port
      * 
      * @param port

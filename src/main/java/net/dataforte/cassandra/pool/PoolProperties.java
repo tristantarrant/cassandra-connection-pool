@@ -30,16 +30,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Tristan Tarrant
  */
-public class PoolProperties implements PoolConfiguration {
+public class PoolProperties implements PoolConfiguration {	
+	static final Pattern URL_PATTERN = Pattern.compile("cassandra:thrift://([\\S&&[^:]]+)(:(\\d{1,5}))?");
+	static final int DEFAULT_THRIFT_PORT = 9160;
 	protected static AtomicInteger poolCounter = new AtomicInteger(0);
 
+	protected String url;
 	protected String host;
 	protected String[] configuredHosts;
-	protected int port = 9160;
+	protected int port = DEFAULT_THRIFT_PORT;
 	protected boolean framed = false;
 	protected boolean automaticHostDiscovery = true;
 	protected HostFailoverPolicy failoverPolicy = HostFailoverPolicy.ON_FAIL_TRY_ALL_AVAILABLE;
@@ -765,7 +770,7 @@ public class PoolProperties implements PoolConfiguration {
 	@Override
 	public void setHost(String host) {
 		this.host = host;
-		String[] hs = this.host.split(";");
+		String[] hs = this.host.split(",");
 		configuredHosts = new String[hs.length];
 
 		for (int i = 0; i < hs.length; i++) {
@@ -779,9 +784,26 @@ public class PoolProperties implements PoolConfiguration {
 		for (int i = 0; i < configuredHosts.length; i++) {
 			if (i > 0)
 				sb.append(",");
-			sb.append(configuredHosts);
+			sb.append(configuredHosts[i]);
 		}
 		return sb.toString();
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		Matcher matcher = URL_PATTERN.matcher(url);
+		if(matcher.matches()) {
+			this.url = url;
+			setHost(matcher.group(1));
+			String p = matcher.group(3);
+			setPort(p==null?DEFAULT_THRIFT_PORT:Integer.parseInt(p));			
+		} else {
+			throw new IllegalArgumentException("The specified url '"+url+"' is not valid");
+		}
+		
 	}
 
 	@Override

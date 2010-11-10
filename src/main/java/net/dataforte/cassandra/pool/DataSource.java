@@ -188,6 +188,16 @@ public class DataSource extends DataSourceProxy implements PoolConfiguration, Ca
 	}
 
 	@Override
+	public void setUrl(String url) {
+		this.poolProperties.setUrl(url);
+	}
+
+	@Override
+	public String getUrl() {
+		return this.poolProperties.getUrl();
+	}
+
+	@Override
 	public void setFramed(boolean framed) {
 		this.poolProperties.setFramed(framed);
 	}
