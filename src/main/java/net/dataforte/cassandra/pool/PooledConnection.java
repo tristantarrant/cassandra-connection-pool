@@ -16,7 +16,6 @@
 
 package net.dataforte.cassandra.pool;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -195,7 +194,7 @@ public class PooledConnection {
     /**
      * Issues a call to {@link #disconnect(boolean)} with the argument false followed by a call to 
      * {@link #connect()}
-     * @throws SQLException if the call to {@link #connect()} fails.
+     * @throws TException if the call to {@link #connect()} fails.
      */
     public void reconnect() throws TException {
         this.disconnect(false);
@@ -278,7 +277,7 @@ public class PooledConnection {
         }
         
         if (!doValidate(validateAction)) {
-            //no validation required, no init sql and props not set
+            //no validation required
             return true;
         }
 
@@ -331,7 +330,7 @@ public class PooledConnection {
             disconnect(true);
         } catch (Exception x) {
             if (log.isDebugEnabled()) {
-                log.debug("Unable to close SQL connection",x);
+                log.debug("Unable to close Thrift connection",x);
             }
         }
         return released.compareAndSet(false, true);
@@ -464,8 +463,7 @@ public class PooledConnection {
 
     /**
      * Returns the underlying connection
-     * @return the underlying JDBC connection as it was returned from the JDBC driver
-     * @see javax.sql.PooledConnection#getConnection()
+     * @return the underlying Thrift connection    
      */
     public Cassandra.Client getConnection() {
         return this.connection;
@@ -477,8 +475,7 @@ public class PooledConnection {
     
     
     /**
-     * Returns the timestamp of when the connection was last connected to the database.
-     * ie, a successful call to {@link java.sql.Driver#connect(String, java.util.Properties)}.
+     * Returns the timestamp of when the connection was last connected to the database.     * 
      * @return the timestamp when this connection was created as defined by {@link System#currentTimeMillis()}
      */
     public long getLastConnected() {
