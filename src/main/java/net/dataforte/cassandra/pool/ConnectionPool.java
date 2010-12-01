@@ -815,9 +815,13 @@ public class ConnectionPool {
 					if (busy.contains(con))
 						continue;
 					long time = con.getTimestamp();
-					if ((con.getReleaseTime() > 0) && ((now - time) > con.getReleaseTime()) && (getSize() > getPoolProperties().getMinIdle())) {
+					if ((con.getReleaseTime() > 0) && ((now - time) > con.getReleaseTime()) && (getSize() > getPoolProperties().getMinIdle())) {	
+						if(log.isDebugEnabled()) {
+							log.debug("Releasing idle connection "+con);
+						}
 						release(con);
 						idle.remove(con);
+						
 						setToNull = true;
 					} else {
 						// do nothing

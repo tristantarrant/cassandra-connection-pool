@@ -146,11 +146,12 @@ public class PooledConnection {
         List<CassandraHost> hosts = parent.getCassandraRing().getHosts();
         Iterator<CassandraHost> hostIterator = hosts.iterator();
         int tried = 0;
+        CassandraHost host = null;
         for(this.transport=null; this.transport==null; ) {
         	if(tried>poolProperties.getFailoverPolicy().numRetries || !hostIterator.hasNext()) {
         		throw new TException("Could not connect to any hosts");
         	}
-        	CassandraHost host = hostIterator.next();
+        	host = hostIterator.next();
         	// If the host is good or the validation interval has passed since last checking with it, attempt to get a connection
         	if(host.isGood() || (host.getLastUsed()+poolProperties.getHostRetryInterval() < System.currentTimeMillis())) {        		
 		        try {
@@ -176,7 +177,10 @@ public class PooledConnection {
 		this.connection = new Cassandra.Client(protocol);
                         
         this.discarded = false;
-        this.lastConnected = System.currentTimeMillis();        
+        this.lastConnected = System.currentTimeMillis();
+        if(log.isDebugEnabled()) {
+        	log.debug("Obtained a new connection to "+host);
+        }
     }
     
     
@@ -210,10 +214,10 @@ public class PooledConnection {
         if (connection != null) {
             try {
                 parent.disconnectEvent(this, finalize);
-                transport.close();
+                transport.close();                
             }catch (Exception ignore) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Unable to close underlying SQL connection",ignore);
+                    log.debug("Unable to close underlying Thrift connection",ignore);
                 }
             }
         }
@@ -288,7 +292,14 @@ public class PooledConnection {
         }
 
         try {
-        	parent.getCassandraRing().refresh(connection); // Bonus: we validate the connection and also get an update list of hosts from Cassandra
+        	if(parent.getPoolProperties().isAutomaticHostDiscovery()) {
+        		parent.getCassandraRing().refresh(connection); // Bonus: we validate the connection and also get an updated list of hosts from Cassandra
+        	} else {
+        		String cluster_name = connection.describe_cluster_name();
+        		if(log.isDebugEnabled()) {
+        			log.debug("Validated connection "+this.toString()+", cluster name = "+cluster_name);
+        		}
+        	}
             this.lastValidated = now;
             return true;
         } catch (Exception ignore) {
