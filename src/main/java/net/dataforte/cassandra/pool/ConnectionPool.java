@@ -351,6 +351,11 @@ public class ConnectionPool {
 		if(log.isInfoEnabled()) {
 			log.info("ConnectionPool initialized.");
 		}
+		if(log.isDebugEnabled()) {
+			for(String p : PoolProperties.getPropertyNames()) {
+				log.debug("ConnectionPool: "+p+"="+poolProperties.get(p));
+			}
+		}
 	}
 
 	// ===============================================================================
@@ -506,13 +511,21 @@ public class ConnectionPool {
 			}
 			if (maxWait == 0 && con == null) { // no wait, return one if we have
 												// one
-				throw new TException("[" + Thread.currentThread().getName() + "] " + "NoWait: Pool empty. Unable to fetch a connection, none available["
+				throw new TException("[" + getName() + "] " + "NoWait: Pool empty. Unable to fetch a connection, none available["
 						+ busy.size() + " in use].");
 			}
 			// we didn't get a connection, lets see if we timed out
 			if (con == null) {
 				if ((System.currentTimeMillis() - now) >= maxWait) {
-					throw new TException("[" + Thread.currentThread().getName() + "] " + "Timeout: Pool empty. Unable to fetch a connection in "
+					if(log.isDebugEnabled()) {
+						int counter = 0;
+						for(Iterator<PooledConnection> i=busy.iterator(); i.hasNext(); ) {
+							PooledConnection connection = i.next();
+							log.debug("Busy connection "+counter+" borrowed at "+connection.getStackTrace());
+							++counter;
+						}
+					}
+					throw new TException("[" + getName() + "] " + "Timeout: Pool empty. Unable to fetch a connection in "
 							+ (maxWait / 1000) + " seconds, none available[" + busy.size() + " in use].");
 				} else {
 					// no timeout, lets try again
@@ -757,6 +770,9 @@ public class ConnectionPool {
 	 * have timed out
 	 */
 	public void checkAbandoned() {
+		if(log.isDebugEnabled()) {
+			log.debug("["+getName()+"] checking for abandoned connections");
+		}
 		try {
 			if (busy.size() == 0)
 				return;
