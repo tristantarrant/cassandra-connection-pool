@@ -33,10 +33,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Tristan Tarrant
  */
-public class PoolProperties implements PoolConfiguration {	
+public class PoolProperties implements PoolConfiguration {
+	static final Logger log = LoggerFactory.getLogger(PoolProperties.class);
 	static final Pattern URL_PATTERN = Pattern.compile("cassandra:thrift://([\\S&&[^:]]+)(:(\\d{1,5}))?");
 	static final int DEFAULT_THRIFT_PORT = 9160;
 	protected static AtomicInteger poolCounter = new AtomicInteger(0);
@@ -110,20 +114,23 @@ public class PoolProperties implements PoolConfiguration {
 		PropertyDescriptor pd = propertyDescriptors.get(name);
   
         if (pd == null) {
-           throw new RuntimeException("Unknown property: " + name);
+        	log.warn("Unknown property: " + name);
+        	return;
         }
   
         Method setter = pd.getWriteMethod();
   
         if (setter == null) {
-           throw new RuntimeException("No write method for: " + name);
+           log.warn("No write method for: " + name);
+           return;
         }
   
         try {
         	Class<?> type = setter.getParameterTypes()[0];
         	// if the incoming value is a string and the setter is for something different from a string, attempt some conversions
         	if(value!=null && value instanceof String && type!=String.class) {
-        		String svalue = (String)value;
+        		String svalue = ((String)value).trim();
+        		
 	        	if(int.class==type) {
 	        		setter.invoke(this, new Object[] { Integer.parseInt(svalue) } );
 	        		return;
@@ -141,7 +148,7 @@ public class PoolProperties implements PoolConfiguration {
         	}
 			setter.invoke(this, new Object[] { value } );
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			log.warn("Error setting property: "+name,e);
 		}
      }
 
