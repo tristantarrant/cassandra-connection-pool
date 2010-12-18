@@ -351,9 +351,9 @@ public class ConnectionPool {
 		if(log.isInfoEnabled()) {
 			log.info("ConnectionPool initialized.");
 		}
-		if(log.isDebugEnabled()) {
+		if(log.isTraceEnabled()) {
 			for(String p : PoolProperties.getPropertyNames()) {
-				log.debug("ConnectionPool: "+p+"="+poolProperties.get(p));
+				log.trace("[" + getName() + "] ConnectionPool: "+p+"="+poolProperties.get(p));
 			}
 		}
 	}
@@ -377,7 +377,7 @@ public class ConnectionPool {
 			con.lock();
 			String trace = con.getStackTrace();
 			if (getPoolProperties().isLogAbandoned()) {
-				log.warn("Connection has been abandoned " + con + ":" + trace);
+				log.warn("[" + getName() + "] Connection has been abandoned " + con + ":" + trace);
 			}
 			if (jmxPool != null) {
 				jmxPool.notify(net.dataforte.cassandra.pool.jmx.ConnectionPoolMBean.NOTIFY_ABANDON, trace);
@@ -411,7 +411,7 @@ public class ConnectionPool {
 			con.lock();
 			String trace = con.getStackTrace();
 			if (getPoolProperties().isLogAbandoned()) {
-				log.warn("Connection has been marked suspect, possibly abandoned " + con + "[" + (System.currentTimeMillis() - con.getTimestamp()) + " ms.]:"
+				log.warn("[" + getName() + "] Connection has been marked suspect, possibly abandoned " + con + "[" + (System.currentTimeMillis() - con.getTimestamp()) + " ms.]:"
 						+ trace);
 			}
 			if (jmxPool != null) {
@@ -455,7 +455,7 @@ public class ConnectionPool {
 	private PooledConnection borrowConnection(int wait) throws TException {
 
 		if (isClosed()) {
-			throw new TException("Connection pool closed.");
+			throw new TException("[" + getName() + "] Connection pool closed.");
 		} // end if
 
 		// get the current time stamp
@@ -503,7 +503,7 @@ public class ConnectionPool {
 				con = idle.poll(timetowait, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException ex) {
 				Thread.interrupted();// clear the flag, and bail out
-				TException sx = new TException("Pool wait interrupted.");
+				TException sx = new TException("[" + getName() + "] Pool wait interrupted.");
 				sx.initCause(ex);
 				throw sx;
 			} finally {
@@ -511,7 +511,7 @@ public class ConnectionPool {
 			}
 			if (maxWait == 0 && con == null) { // no wait, return one if we have
 												// one
-				throw new TException("[" + getName() + "] " + "NoWait: Pool empty. Unable to fetch a connection, none available["
+				throw new TException("[" + getName() + "] NoWait: Pool empty. Unable to fetch a connection, none available["
 						+ busy.size() + " in use].");
 			}
 			// we didn't get a connection, lets see if we timed out
@@ -521,11 +521,11 @@ public class ConnectionPool {
 						int counter = 0;
 						for(Iterator<PooledConnection> i=busy.iterator(); i.hasNext(); ) {
 							PooledConnection connection = i.next();
-							log.debug("Busy connection "+counter+" borrowed at "+connection.getStackTrace());
+							log.debug("[" + getName() + "] Busy connection "+counter+" borrowed at "+connection.getStackTrace());
 							++counter;
 						}
 					}
-					throw new TException("[" + getName() + "] " + "Timeout: Pool empty. Unable to fetch a connection in "
+					throw new TException("[" + getName() + "] Timeout: Pool empty. Unable to fetch a connection in "
 							+ (maxWait / 1000) + " seconds, none available[" + busy.size() + " in use].");
 				} else {
 					// no timeout, lets try again
@@ -561,7 +561,7 @@ public class ConnectionPool {
 					con.setStackTrace(getThreadDump());
 				}
 				if (!busy.offer(con)) {
-					log.debug("Connection doesn't fit into busy array, connection will not be traceable.");
+					log.debug("[" + getName() + "] Connection doesn't fit into busy array, connection will not be traceable.");
 				}				
 				return con;
 			} else {
@@ -572,7 +572,7 @@ public class ConnectionPool {
 		} catch (Exception e) {
 			error = true;
 			if (log.isDebugEnabled())
-				log.debug("Unable to create a new Cassandra connection.", e);
+				log.debug("[" + getName() + "] Unable to create a new Cassandra connection.", e);
 			if (e instanceof TException) {
 				throw (TException) e;
 			} else {
@@ -624,7 +624,7 @@ public class ConnectionPool {
 					con.setStackTrace(getThreadDump());
 				}
 				if (!busy.offer(con)) {
-					log.debug("Connection doesn't fit into busy array, connection will not be traceable.");
+					log.debug("[" + getName() + "] Connection doesn't fit into busy array, connection will not be traceable.");
 				}
 				return con;
 			}
@@ -643,14 +643,14 @@ public class ConnectionPool {
 						con.setStackTrace(getThreadDump());
 					}
 					if (!busy.offer(con)) {
-						log.debug("Connection doesn't fit into busy array, connection will not be traceable.");
+						log.debug("[" + getName() + "] Connection doesn't fit into busy array, connection will not be traceable.");
 					}
 					return con;
 				} else {
 					// validation failed.
 					release(con);
 					setToNull = true;
-					throw new TException("Failed to validate a newly established connection.");
+					throw new TException("[" + getName() + "] Failed to validate a newly established connection.");
 				}
 			} catch (Exception x) {
 				release(con);
@@ -727,20 +727,20 @@ public class ConnectionPool {
 						con.setTimestamp(System.currentTimeMillis());
 						if (((idle.size() >= poolProperties.getMaxIdle()) && !poolProperties.isPoolSweeperEnabled()) || (!idle.offer(con))) {
 							if (log.isDebugEnabled()) {
-								log.debug("Connection [" + con + "] will be closed and not returned to the pool, idle[" + idle.size() + "]>=maxIdle["
+								log.debug("[" + getName() + "] Connection [" + con + "] will be closed and not returned to the pool, idle[" + idle.size() + "]>=maxIdle["
 										+ poolProperties.getMaxIdle() + "] idle.offer failed.");
 							}
 							release(con);
 						}
 					} else {
 						if (log.isDebugEnabled()) {
-							log.debug("Connection [" + con + "] will be closed and not returned to the pool.");
+							log.debug("[" + getName() + "] Connection [" + con + "] will be closed and not returned to the pool.");
 						}
 						release(con);
 					} // end if
 				} else {
 					if (log.isDebugEnabled()) {
-						log.debug("Connection [" + con + "] will be closed and not returned to the pool, busy.remove failed.");
+						log.debug("[" + getName() + "] Connection [" + con + "] will be closed and not returned to the pool, busy.remove failed.");
 					}
 					release(con);
 				}
@@ -770,8 +770,8 @@ public class ConnectionPool {
 	 * have timed out
 	 */
 	public void checkAbandoned() {
-		if(log.isDebugEnabled()) {
-			log.debug("["+getName()+"] checking for abandoned connections");
+		if(log.isTraceEnabled()) {
+			log.trace("["+getName()+"] checking for abandoned connections");
 		}
 		try {
 			if (busy.size() == 0)
@@ -833,7 +833,7 @@ public class ConnectionPool {
 					long time = con.getTimestamp();
 					if ((con.getReleaseTime() > 0) && ((now - time) > con.getReleaseTime()) && (getSize() > getPoolProperties().getMinIdle())) {	
 						if(log.isDebugEnabled()) {
-							log.debug("Releasing idle connection "+con);
+							log.debug("[" + getName() + "] Releasing idle connection "+con);
 						}
 						release(con);
 						idle.remove(con);
@@ -849,9 +849,9 @@ public class ConnectionPool {
 				}
 			} // while
 		} catch (ConcurrentModificationException e) {
-			log.debug("checkIdle failed.", e);
+			log.debug("[" + getName() + "] checkIdle failed.", e);
 		} catch (Exception e) {
-			log.warn("checkIdle failed, it will be retried.", e);
+			log.warn("[" + getName() + "] checkIdle failed, it will be retried.", e);
 		}
 
 	}
@@ -881,9 +881,9 @@ public class ConnectionPool {
 				}
 			} // while
 		} catch (ConcurrentModificationException e) {
-			log.debug("testAllIdle failed.", e);
+			log.debug("[" + getName() + "] testAllIdle failed.", e);
 		} catch (Exception e) {
-			log.warn("testAllIdle failed, it will be retried.", e);
+			log.warn("[" + getName() + "] testAllIdle failed, it will be retried.", e);
 		}
 
 	}
@@ -905,11 +905,11 @@ public class ConnectionPool {
 						continue;
 					cassandraRing.refresh(con.getConnection());
 					// we have successfully refreshed the ring, we can quit now
-					log.debug("refreshRing success, ring = "+cassandraRing);
+					log.debug("[" + getName() + "] refreshRing success, ring = "+cassandraRing);
 					return;
 				} catch (TTransportException t) {
 					// there was an error retrieving ring information from this connection, remove it
-					log.warn("removing connection to non-responding host ");
+					log.warn("[" + getName() + "] removing connection to non-responding host ");
 					idle.remove(con);
 					release(con);
 				} finally {
@@ -917,9 +917,9 @@ public class ConnectionPool {
 				}
 			} // while			
 		} catch (ConcurrentModificationException e) {
-			log.debug("refreshRing failed.", e);
+			log.debug("[" + getName() + "] refreshRing failed.", e);
 		} catch (Exception e) {
-			log.warn("refreshRing failed, it will be retried.", e);
+			log.warn("[" + getName() + "] refreshRing failed, it will be retried.", e);
 		}
 
 	}
@@ -1023,10 +1023,10 @@ public class ConnectionPool {
 			this.pool = pool;
 			this.sleepTime = sleepTime;
 			if (sleepTime <= 0) {
-				log.warn("Database connection pool maintenance thread interval is set to 0, defaulting to 30 seconds");
+				log.warn("[" + getName() + "] Database connection pool maintenance thread interval is set to 0, defaulting to 30 seconds");
 				this.sleepTime = 1000 * 30;
 			} else if (sleepTime < 1000) {
-				log.warn("Database connection pool maintenance thread interval is set to lower than 1 second.");
+				log.warn("[" + getName() + "] Database connection pool maintenance thread interval is set to lower than 1 second.");
 			}
 		}
 

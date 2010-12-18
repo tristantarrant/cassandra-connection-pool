@@ -133,12 +133,12 @@ public class PooledConnection {
     }
 
     public void connect() throws TException {
-        if (released.get()) throw new TException("A connection once released, can't be reestablished.");
+        if (released.get()) throw new TException("[" + parent.getName() + "] A connection once released, can't be reestablished.");
         if (connection != null) {
             try {
                 this.disconnect(false);
             } catch (Exception x) {
-                log.debug("Unable to disconnect previous connection.", x);
+                log.debug("[" + parent.getName() + "] Unable to disconnect previous connection.", x);
             } //catch
         } //end if
         
@@ -148,7 +148,7 @@ public class PooledConnection {
         CassandraHost host = null;
         for(this.transport=null; this.transport==null; ) {
         	if(tried>poolProperties.getFailoverPolicy().numRetries || !hostIterator.hasNext()) {
-        		throw new TException("Could not connect to any hosts");
+        		throw new TException("[" + parent.getName() + "] Could not connect to any hosts");
         	}
         	host = hostIterator.next();
         	// If the host is good or the validation interval has passed since last checking with it, attempt to get a connection
@@ -165,7 +165,7 @@ public class PooledConnection {
 		        } catch (TTransportException tte) {
 		        	host.timestamp();
 		        	host.setGood(false);
-		        	log.warn("Failed connection to "+host);		        	
+		        	log.warn("[" + parent.getName() + "] Failed connection to "+host);		        	
 		        	this.transport = null;
 		        	tried++;
 		        }
@@ -178,7 +178,7 @@ public class PooledConnection {
         this.discarded = false;
         this.lastConnected = System.currentTimeMillis();
         if(log.isDebugEnabled()) {
-        	log.debug("Obtained a new connection to "+host);
+        	log.debug("[" + parent.getName() + "] Obtained a new connection to "+host);
         }
     }
     
@@ -216,7 +216,7 @@ public class PooledConnection {
                 transport.close();                
             }catch (Exception ignore) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Unable to close underlying Thrift connection",ignore);
+                    log.debug("[" + parent.getName() + "] Unable to close underlying Thrift connection", ignore);
                 }
             }
         }
@@ -295,15 +295,15 @@ public class PooledConnection {
         		parent.getCassandraRing().refresh(connection); // Bonus: we validate the connection and also get an updated list of hosts from Cassandra
         	} else {
         		String cluster_name = connection.describe_cluster_name();
-        		if(log.isDebugEnabled()) {
-        			log.debug("Validated connection "+this.toString()+", cluster name = "+cluster_name);
+        		if(log.isTraceEnabled()) {
+        			log.trace("[" + parent.getName() + "] Validated connection "+this.toString()+", cluster name = "+cluster_name);
         		}
         	}
             this.lastValidated = now;
             return true;
         } catch (Exception ignore) {
             if (log.isDebugEnabled())
-                log.debug("Unable to validate object:",ignore);
+                log.debug("[" + parent.getName() + "] Unable to validate object:",ignore);
         }
         return false;
     } //validate
@@ -330,7 +330,7 @@ public class PooledConnection {
             disconnect(true);
         } catch (Exception x) {
             if (log.isDebugEnabled()) {
-                log.debug("Unable to close Thrift connection",x);
+                log.debug("[" + parent.getName() + "] Unable to close Thrift connection",x);
             }
         }
         return released.compareAndSet(false, true);
@@ -380,7 +380,7 @@ public class PooledConnection {
      * @throws IllegalStateException if this method is called with the value false and the value true has already been set.
      */
     public void setDiscarded(boolean discarded) {
-        if (this.discarded && !discarded) throw new IllegalStateException("Unable to change the state once the connection has been discarded");
+        if (this.discarded && !discarded) throw new IllegalStateException("[" + parent.getName() + "] Unable to change the state once the connection has been discarded");
         this.discarded = discarded;
     }
 
