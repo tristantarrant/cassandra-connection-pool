@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.apache.cassandra.thrift.Cassandra;
 import org.apache.cassandra.thrift.InvalidRequestException;
+import org.apache.cassandra.thrift.KsDef;
 import org.apache.cassandra.thrift.TokenRange;
 import org.apache.thrift.TException;
 
@@ -71,11 +72,11 @@ public class CassandraRing {
 	public synchronized void refresh(Cassandra.Iface connection) throws TException, InvalidRequestException {
 
 		// Obtain a set of available keyspaces
-		Set<String> ks = connection.describe_keyspaces();
+		List<KsDef> ks = connection.describe_keyspaces();
 		String keyspace = null;
-		for (String k : ks) {
-			if (!"system".equalsIgnoreCase(k)) {
-				keyspace = k;
+		for (KsDef k : ks) {
+			if (!"system".equalsIgnoreCase(k.getName())) {
+				keyspace = k.getName();
 				break;
 			}
 		}
@@ -88,7 +89,6 @@ public class CassandraRing {
 			addresses.addAll(range.getEndpoints());
 		}
 		this.hosts = hostArrayToMap(addresses.toArray(new String[] {}));
-
 	}
 
 	public List<CassandraHost> getHosts() {

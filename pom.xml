@@ -1,20 +1,26 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>net.dataforte</groupId>
 		<artifactId>dataforte-parent</artifactId>
-		<version>5</version>
+		<version>6</version>
 	</parent>
 
 	<groupId>net.dataforte.cassandra</groupId>
-	<version>0.3.6-SNAPSHOT</version>
+	<version>0.3.7-SNAPSHOT</version>
 	<artifactId>cassandra-connection-pool</artifactId>
 	<packaging>jar</packaging>
 
 	<name>Cassandra Connection Pool</name>
 	<description>Cassandra Connection Pool: a flexible, robust connection pool for Apache Cassandra</description>
 	<url>http://www.dataforte.net/software/${project.artifactId}</url>
+
+	<properties>
+		<cassandra.version>0.7.2</cassandra.version>
+		<slf4j.version>1.6.1</slf4j.version>
+	</properties>
 
 
 	<contributors>
@@ -48,23 +54,29 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.6.1</version>
+			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cassandra</groupId>
 			<artifactId>apache-cassandra-thrift</artifactId>
-			<version>0.6.8</version>
+			<version>${cassandra.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cassandra</groupId>
-			<artifactId>apache-cassandra</artifactId>
-			<version>0.6.8</version>
+			<artifactId>cassandra-all</artifactId>
+			<version>${cassandra.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>	
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna</artifactId>
+			<version>3.2.7</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.6.1</version>
+			<version>${slf4j.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -87,6 +99,6 @@
 				<directory>src/test/resources</directory>
 				<filtering>true</filtering>
 			</testResource>
-		</testResources>		
+		</testResources>
 	</build>
 </project>

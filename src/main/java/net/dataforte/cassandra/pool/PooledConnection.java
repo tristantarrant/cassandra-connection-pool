@@ -27,7 +27,7 @@ import org.apache.cassandra.thrift.Cassandra;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.transport.TFramedTransport;
+import org.apache.thrift.transport.TFastFramedTransport;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
@@ -156,7 +156,7 @@ public class PooledConnection {
 		        try {
 			        TSocket socket = new TSocket(host.getHost(), poolProperties.getPort(), poolProperties.getSocketTimeout());	    
 					if (poolProperties.isFramed())
-						this.transport = new TFramedTransport(socket);
+						this.transport = new TFastFramedTransport(socket);
 					else
 						this.transport = socket;
 					host.timestamp();
