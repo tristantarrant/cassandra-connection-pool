@@ -23,7 +23,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.apache.cassandra.thrift.AuthenticationException;
+import org.apache.cassandra.thrift.AuthenticationRequest;
+import org.apache.cassandra.thrift.AuthorizationException;
 import org.apache.cassandra.thrift.Cassandra;
+import org.apache.cassandra.thrift.InvalidRequestException;
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
@@ -174,6 +178,33 @@ public class PooledConnection {
 		TProtocol protocol = new TBinaryProtocol(this.transport);
 
 		this.connection = new Cassandra.Client(protocol);
+		
+		if(poolProperties.getUsername()!=null) {
+			AuthenticationRequest authenticationRequest = new AuthenticationRequest();
+			authenticationRequest.putToCredentials("username", poolProperties.getUsername());
+			authenticationRequest.putToCredentials("password", poolProperties.getPassword());
+			try {
+				this.connection.login(authenticationRequest);
+			} catch (AuthenticationException e) {
+				this.disconnect(false);
+				throw new TException(e);
+			} catch (AuthorizationException e) {
+				this.disconnect(false);
+				throw new TException(e);
+			}
+			
+		}
+		
+		
+		if(poolProperties.getKeySpace()!=null) {
+			try {
+				this.connection.set_keyspace(poolProperties.getKeySpace());
+			} catch (InvalidRequestException e) {
+				this.disconnect(false);
+				throw new TException(e);
+			}
+		}
+		
                         
         this.discarded = false;
         this.lastConnected = System.currentTimeMillis();
@@ -195,8 +226,11 @@ public class PooledConnection {
      * Issues a call to {@link #disconnect(boolean)} with the argument false followed by a call to 
      * {@link #connect()}
      * @throws TException if the call to {@link #connect()} fails.
+     * @throws InvalidRequestException 
+     * @throws AuthorizationException 
+     * @throws AuthenticationException 
      */
-    public void reconnect() throws TException {
+    public void reconnect() throws TException, AuthenticationException, AuthorizationException, InvalidRequestException {
         this.disconnect(false);
         this.connect();
     } //reconnect

@@ -316,6 +316,17 @@ public interface PoolConfiguration {
     public String getPoolName();
     
     /**
+     * Returns the keyspace
+     */
+    public String getKeySpace();
+    
+    /**
+     * Sets the keyspace
+     * @param keySpace
+     */
+    public void setKeySpace(String keySpace);
+    
+    /**
      * Returns the username used to establish the connection with
      * @return the username used to establish the connection with
      */

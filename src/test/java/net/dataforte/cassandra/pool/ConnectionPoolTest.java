@@ -24,7 +24,7 @@ import org.apache.thrift.transport.TTransportException;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ConnectionPoolTest extends EmbeddedServerHelper {
+public class ConnectionPoolTest extends BaseEmbededServerSetupTest {
 
 	
 

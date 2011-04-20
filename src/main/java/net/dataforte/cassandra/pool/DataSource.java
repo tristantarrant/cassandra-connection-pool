@@ -25,7 +25,8 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import org.apache.cassandra.thrift.CassandraThriftDataSource;
+import net.dataforte.cassandra.thrift.CassandraThriftDataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -353,6 +354,16 @@ public class DataSource extends DataSourceProxy implements PoolConfiguration, Ca
 	@Override
 	public String getPoolName() {
 		return this.poolProperties.getPoolName();
+	}
+	
+	@Override
+	public String getKeySpace() {
+		return this.poolProperties.getKeySpace();
+	}
+
+	@Override
+	public void setKeySpace(String keySpace) {
+		this.poolProperties.setKeySpace(keySpace);
 	}
 
 	@Override

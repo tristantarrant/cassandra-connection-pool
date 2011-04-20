@@ -26,7 +26,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.cassandra.thrift.AuthenticationException;
+import org.apache.cassandra.thrift.AuthorizationException;
 import org.apache.cassandra.thrift.Cassandra;
+import org.apache.cassandra.thrift.InvalidRequestException;
 import org.apache.thrift.TException;
 import org.apache.thrift.transport.TTransportException;
 import org.slf4j.Logger;
@@ -116,6 +119,7 @@ public class ConnectionPool {
 	 * 
 	 * @param prop
 	 *            PoolProperties - all the properties for this connection pool
+	 * @throws Exception 
 	 * @throws SQLException
 	 */
 	public ConnectionPool(PoolConfiguration prop) throws TException {
@@ -132,6 +136,9 @@ public class ConnectionPool {
 	 * 
 	 * @return Connection - a java.sql.Connection/javax.sql.PooledConnection
 	 *         reflection proxy, wrapping the underlying object.
+	 * @throws InvalidRequestException 
+	 * @throws AuthorizationException 
+	 * @throws AuthenticationException 
 	 * @throws SQLException
 	 *             - if the wait times out or a failure occurs creating a
 	 *             connection
@@ -269,6 +276,7 @@ public class ConnectionPool {
 	 * 
 	 * @param properties
 	 *            PoolProperties - properties used to initialize the pool with
+	 * @throws Exception 
 	 * @throws SQLException
 	 *             if initialization fails
 	 */
@@ -330,11 +338,11 @@ public class ConnectionPool {
 															// be no contention
 			} // for
 
-		} catch (TException x) {
+		} catch (Exception x) {
 			if (jmxPool != null)
 				jmxPool.notify(net.dataforte.cassandra.pool.jmx.ConnectionPoolMBean.NOTIFY_INIT, getStackTrace(x));
 			close(true);
-			throw x;
+			throw new TException(x);
 		} finally {
 			// return the members as idle to the pool
 			for (int i = 0; i < initialPool.length; i++) {
@@ -450,6 +458,9 @@ public class ConnectionPool {
 	 *            - time to wait, overrides the maxWait from the properties, set
 	 *            to -1 if you wish to use maxWait, 0 if you wish no wait time.
 	 * @return PooledConnection
+	 * @throws InvalidRequestException 
+	 * @throws AuthorizationException 
+	 * @throws AuthenticationException 
 	 * @throws SQLException
 	 */
 	private PooledConnection borrowConnection(int wait) throws TException {
@@ -597,6 +608,9 @@ public class ConnectionPool {
 	 * @param con
 	 *            - the connection to validate and configure
 	 * @return con
+	 * @throws InvalidRequestException 
+	 * @throws AuthorizationException 
+	 * @throws AuthenticationException 
 	 * @throws SQLException
 	 *             if a validation error happens
 	 */

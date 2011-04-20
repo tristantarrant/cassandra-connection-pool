@@ -71,6 +71,7 @@ public class PoolProperties implements PoolConfiguration {
 	protected int removeAbandonedTimeout = 60;
 	protected boolean logAbandoned = false;
 	protected String name = "Cassandra Connection Pool[" + (poolCounter.incrementAndGet()) + "-" + System.identityHashCode(PoolProperties.class) + "]";
+	protected String keySpace;
 	protected String password;
 	protected String username;
 	protected long validationInterval = 30000;
@@ -510,6 +511,23 @@ public class PoolProperties implements PoolConfiguration {
 	@Override
 	public void setTimeBetweenEvictionRunsMillis(int timeBetweenEvictionRunsMillis) {
 		this.timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getKeySpace() {
+		return keySpace;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setKeySpace(String keySpace) {
+		this.keySpace = keySpace;
+		
 	}
 
 	/**

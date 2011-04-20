@@ -16,17 +16,19 @@
 
 package net.dataforte.cassandra.pool;
 
+import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.thrift.Cassandra;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class DataSourceTest extends EmbeddedServerHelper {
+public class DataSourceTest extends BaseEmbededServerSetupTest {
 
 	@Test
 	public void testDataSource() throws Exception {
 		DataSource ds = new DataSource();
-
 		ds.setHost("localhost");
+		ds.setPort(DatabaseDescriptor.getRpcPort());
+		
 		ds.setInitialSize(2);
 		ds.setMinIdle(1);
 		ds.setMaxIdle(4);
