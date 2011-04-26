@@ -3,9 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>net.dataforte</groupId>
-		<artifactId>dataforte-parent</artifactId>
-		<version>6</version>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
 	</parent>
 
 	<groupId>net.dataforte.cassandra</groupId>
@@ -18,37 +18,21 @@
 	<url>http://www.dataforte.net/software/${project.artifactId}</url>
 
 	<properties>
-		<cassandra.version>0.7.2</cassandra.version>
+		<cassandra.version>0.7.4</cassandra.version>
 		<slf4j.version>1.6.1</slf4j.version>
+		<junit.version>4.8.2</junit.version>
 	</properties>
 
 
-	<contributors>
-		<contributor>
+	<developers>
+		<developer>
+			<id>tristantarrant</id>
 			<name>Tristan Tarrant</name>
 			<email>tristan.tarrant@dataforte.net</email>
 			<organization>Dataforte</organization>
 			<organizationUrl>http://www.dataforte.net</organizationUrl>
-		</contributor>
-	</contributors>
-
-	<distributionManagement>
-		<site>
-			<id>ftp.dataforte.net</id>
-			<name>Dataforte site</name>
-			<url>ftp://ftp.dataforte.net/www.dataforte.net/software/</url>
-		</site>
-	</distributionManagement>
-
-	<repositories>
-		<repository>
-			<id>dataforte</id>
-			<url>http://www.dataforte.net/listing/maven/releases</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
+		</developer>
+	</developers>
 
 	<dependencies>
 		<dependency>
@@ -58,13 +42,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cassandra</groupId>
-			<artifactId>apache-cassandra-thrift</artifactId>
+			<artifactId>cassandra-all</artifactId>
 			<version>${cassandra.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.cassandra</groupId>
-			<artifactId>cassandra-all</artifactId>
-			<version>${cassandra.version}</version>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -84,11 +68,6 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.16</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.javassist</groupId>
-			<artifactId>javassist</artifactId>
-			<version>3.14.0-GA</version>
 		</dependency>
 	</dependencies>
 
