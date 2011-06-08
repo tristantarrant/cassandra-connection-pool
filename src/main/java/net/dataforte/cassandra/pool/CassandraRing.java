@@ -80,6 +80,10 @@ public class CassandraRing {
 				break;
 			}
 		}
+		if(keyspace==null) {
+			// cannot get a ring without a keyspace
+			return;
+		}
 		// Get a token range for the keyspace
 		List<TokenRange> ranges = connection.describe_ring(keyspace);
 		Set<String> addresses = new HashSet<String>();

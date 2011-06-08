@@ -9,10 +9,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.cassandra.config.CFMetaData;
 import org.apache.cassandra.config.ConfigurationException;
 import org.apache.cassandra.config.DatabaseDescriptor;
-import org.apache.cassandra.config.KSMetaData;
 import org.apache.cassandra.db.commitlog.CommitLog;
 import org.apache.cassandra.io.util.FileUtils;
 import org.apache.cassandra.thrift.CassandraDaemon;
@@ -67,7 +65,6 @@ public class EmbeddedServerHelper {
 		System.setProperty("cassandra-foreground", "true");
 
 		cleanupAndLeaveDirs();
-		loadSchemaFromYaml();
 
 		executor.execute(new CassandraRunner());
 		try {
@@ -157,20 +154,7 @@ public class EmbeddedServerHelper {
 		}
 	}
 
-	public static void loadSchemaFromYaml() {
-		try {
-			for (KSMetaData ksm : DatabaseDescriptor.readTablesFromYaml()) {
-				for (CFMetaData cfm : ksm.cfMetaData().values())
-					CFMetaData.map(cfm);
-				DatabaseDescriptor.setTableDefinition(ksm, DatabaseDescriptor.getDefsVersion());
-			}
-		} catch (ConfigurationException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	class CassandraRunner implements Runnable {
-		@Override
+	class CassandraRunner implements Runnable {		
 		public void run() {
 			cassandraDaemon = new CassandraDaemon();
 			cassandraDaemon.activate();
