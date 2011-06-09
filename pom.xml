@@ -41,8 +41,14 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cassandra</groupId>
+			<artifactId>cassandra-thrift</artifactId>
+			<version>${cassandra.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.cassandra</groupId>
 			<artifactId>cassandra-all</artifactId>
 			<version>${cassandra.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

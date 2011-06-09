@@ -17,7 +17,6 @@
 package net.dataforte.cassandra.thrift;
 
 import org.apache.cassandra.thrift.Cassandra;
-import org.apache.cassandra.thrift.Cassandra.Client;
 import org.apache.thrift.TException;
 
 public interface CassandraThriftDataSource {

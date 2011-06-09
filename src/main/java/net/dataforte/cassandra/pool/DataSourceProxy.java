@@ -71,6 +71,8 @@ public class DataSourceProxy {
 
 	
 	public void releaseConnection(Cassandra.Client connection) {
+		if(connection == null)
+			return;
 		if(pool == null) 
 			throw new IllegalStateException("Attempt to release a connection on an uninitialized pool");
 		pool.release(connection);
