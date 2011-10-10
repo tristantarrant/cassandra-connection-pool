@@ -1,7 +1,7 @@
-Cassandra Connection Pool
-=========================
+Cassandra Thrift Connection Pool
+================================
 
-This is an implementation of a Connection Pool for Cassandra based on Tomcat 7's excellent jdbc-pool
+This is an implementation of a Connection Pool for Cassandra's Thrift API based on Tomcat 7's excellent jdbc-pool
 
 	http://people.apache.org/~fhanik/jdbc-pool/jdbc-pool.html
 	
@@ -16,6 +16,4 @@ It also supports Cassandra Ring discovery with different failover policies
 	
 Most of the code was writtern by Filip Hanik, so the credit should go to him.
 
-If you use Maven, you can get artifacts for this project at my repository:
-
-	http://www.dataforte.net/listing/maven/releases
+Maven artifacts should be available in Central
