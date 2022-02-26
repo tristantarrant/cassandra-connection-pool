@@ -17,7 +17,7 @@
 	<url>http://www.dataforte.net/software/${project.artifactId}</url>
 
 	<properties>
-		<cassandra.version>1.0.0-rc2</cassandra.version>
+		<cassandra.version>3.0.26</cassandra.version>
 		<slf4j.version>1.6.1</slf4j.version>
 		<junit.version>4.8.2</junit.version>
 	</properties>
